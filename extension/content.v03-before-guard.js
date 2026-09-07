@@ -127,8 +127,6 @@
     } catch (err) { /* ignore */ }
   });
 
-  let reported = 0;
-  const guarded = fn => () => { try { fn(); } catch (e) { if (reported++ < 5) console.error('BlueLyrics reporter error in', fn.name, e); } };
-  setInterval(guarded(tick), 250);
-  setInterval(guarded(mirror), 200);
+  setInterval(tick, 250);
+  setInterval(mirror, 200);
 })();

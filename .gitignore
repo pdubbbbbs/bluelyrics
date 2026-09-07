@@ -1,5 +1,5 @@
 # build products and local state
-BlueLyrics
+/BlueLyrics
 BlueLyrics.app/
 BlueLyrics.app.previous-*/
 *.building/
@@ -19,3 +19,5 @@ app/build/
 app/*.xcodeproj/xcuserdata/
 app/*.xcodeproj/project.xcworkspace/xcuserdata/
 app/dist/
+app/build-nosandbox/
+app/backups/

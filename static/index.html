@@ -262,6 +262,12 @@
   #captions .cap { font-family: var(--display-font), Inter, sans-serif; font-weight: 700; color: #fff; line-height: 1.15; letter-spacing: .03em;
     font-size: calc(6.5vmin * var(--scale)); text-shadow: 0 0 18px rgba(var(--glow-2), .85), 0 0 46px rgba(var(--glow-3), .7); text-wrap: balance; }
   #captions .cap.old { color: rgba(230,244,255,.5); text-shadow: none; font-weight: 500; font-size: calc(4vmin * var(--scale)); }
+  #permission { display: none; position: fixed; left: 50%; top: 14%; transform: translateX(-50%); max-width: 80vw; padding: 3vmin 4vmin; z-index: 12; text-align: center;
+    background: rgba(6, 16, 30, 0.94); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 0 40px rgba(var(--glow-2), .3); }
+  #permission.show { display: block; }
+  #permission h2 { font: 700 3.2vmin Inter, sans-serif; color: var(--cyan-bright); margin-bottom: 1.5vmin; }
+  #permission p { font: 400 2.3vmin Inter, sans-serif; color: var(--text); line-height: 1.5; margin-bottom: 1.2vmin; }
+  #permission button { margin-top: 1vmin; }
   #controls button.listen.on { background: rgba(var(--glow-2), .35); border-color: var(--cyan-bright); box-shadow: 0 0 14px rgba(var(--glow-2), .6); }
   #controls button {
     font: 600 max(15px, 1.9vmin) Inter, -apple-system, sans-serif;
@@ -342,6 +348,12 @@
     <button data-cmd="close" data-app class="danger" title="Close this window">Close</button>
   </nav>
   <button id="reveal" hidden title="Show the control bar (h)">Show controls</button>
+  <div id="permission" role="alert">
+    <h2>One switch to flip</h2>
+    <p>BlueLyrics is listening, but macOS is sending it silence. Allow it once:</p>
+    <p>System Settings → Privacy &amp; Security → Screen &amp; System Audio Recording → under "System Audio Recording Only" press the plus button and choose BlueLyrics.</p>
+    <button id="openPermission">Open that setting</button>
+  </div>
   <div id="cast" role="dialog" aria-label="Cast address">
     <div>
       <h2>Open this on any screen</h2>
@@ -414,6 +426,11 @@
     source.addEventListener('pos', e => onPos(JSON.parse(e.data)));
     source.addEventListener('prefs', e => { const p = JSON.parse(e.data); applyFont(p); applyTheme(p.prefs?.theme); });
     source.addEventListener('caption', e => onCaption(JSON.parse(e.data)));
+    document.getElementById('openPermission')?.addEventListener('click', () => fetch('/open-audio-permission', { method: 'POST' }).catch(() => {}));
+    setInterval(async () => {
+      if (!listening) { document.getElementById('permission').classList.remove('show'); return; }
+      try { const j = await (await fetch('/listen')).json(); document.getElementById('permission').classList.toggle('show', !!j.needsPermission); } catch {}
+    }, 4000);
     source.addEventListener('listen', e => { listening = JSON.parse(e.data).state === 'listening'; controls.querySelector('[data-cmd="listen"]')?.classList.toggle('on', listening); if (!listening) body.classList.remove('captions'); });
     source.onopen = () => { el.tag.textContent = 'live'; };
     source.onerror = () => { el.tag.textContent = 'reconnecting'; };
