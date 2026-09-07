@@ -29,6 +29,13 @@
   /* Display faces are registered from the server's font list (see applyFont). Default: Cinzel. */
   @font-face { font-family: "Cinzel"; src: url("/fonts/Cinzel%5Bwght%5D.ttf") format("truetype"); font-weight: 400 900; font-display: swap; }
   :root { --display-font: "Cinzel"; }
+  /* themes: only the accent trio changes; glow shadows read these through rgb() below */
+  :root, [data-theme="blueguard"] { --glow-1: 128, 229, 255; --glow-2: 0, 212, 255; --glow-3: 33, 150, 243; --bg-0: #040d1a; --bg-1: #0a1628; }
+  [data-theme="ember"]   { --glow-1: 255, 214, 150; --glow-2: 255, 140, 40;  --glow-3: 220, 60, 20;   --bg-0: #1a0a04; --bg-1: #2a1208; --cyan: #ff9a3c; --cyan-soft: #ffb36b; --cyan-bright: #ffd9a8; --blue: #e0521c; --violet: #ff3d6e; }
+  [data-theme="violet"]  { --glow-1: 230, 190, 255; --glow-2: 190, 110, 255; --glow-3: 120, 40, 220;  --bg-0: #0b0416; --bg-1: #170a2a; --cyan: #c48bff; --cyan-soft: #d3a8ff; --cyan-bright: #ecd6ff; --blue: #7c3aed; --violet: #ff4fd8; }
+  [data-theme="emerald"] { --glow-1: 190, 255, 220; --glow-2: 60, 230, 160;  --glow-3: 0, 160, 110;   --bg-0: #03120c; --bg-1: #072318; --cyan: #3ee6a0; --cyan-soft: #7df0c0; --cyan-bright: #c8ffe8; --blue: #0ea875; --violet: #38bdf8; }
+  [data-theme="mono"]    { --glow-1: 255, 255, 255; --glow-2: 220, 220, 220; --glow-3: 150, 150, 150; --bg-0: #050505; --bg-1: #121212; --cyan: #e6e6e6; --cyan-soft: #cfcfcf; --cyan-bright: #ffffff; --blue: #9a9a9a; --violet: #bbbbbb; }
+  [data-theme="rose"]    { --glow-1: 255, 200, 220; --glow-2: 255, 110, 160; --glow-3: 200, 30, 90;   --bg-0: #160408; --bg-1: #260a12; --cyan: #ff7ab0; --cyan-soft: #ff9cc4; --cyan-bright: #ffd6e6; --blue: #d61c5c; --violet: #ff8a3d; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { user-select: none; -webkit-user-select: none; }
   html, body { height: 100%; width: 100%; overflow: hidden; }
@@ -173,9 +180,9 @@
     color: #ffffff;
     opacity: 1;
     text-shadow:
-      0 0 18px rgba(0, 212, 255, 0.85),
-      0 0 46px rgba(33, 150, 243, 0.7),
-      0 0 110px rgba(33, 150, 243, 0.45);
+      0 0 18px rgba(var(--glow-2), 0.85),
+      0 0 46px rgba(var(--glow-3), 0.7),
+      0 0 110px rgba(var(--glow-3), 0.45);
     animation: glow 3.4s ease-in-out infinite;
   }
   .line.enter { animation: rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), glow 3.4s ease-in-out infinite; }
@@ -198,9 +205,9 @@
   .line.now .w.singing {
     color: #ffffff;
     text-shadow:
-      0 0 22px rgba(128, 229, 255, 1),
-      0 0 50px rgba(0, 212, 255, 1),
-      0 0 120px rgba(33, 150, 243, 0.8);
+      0 0 22px rgba(var(--glow-1), 1),
+      0 0 50px rgba(var(--glow-2), 1),
+      0 0 120px rgba(var(--glow-3), 0.8);
   }
   .line.now.words { text-shadow: none; animation: none; }
 
@@ -249,6 +256,13 @@
     box-shadow: 0 0 18px rgba(0, 212, 255, 0.35);
   }
   #reveal[hidden] { display: none; }
+  #captions { display: none; flex-direction: column; justify-content: flex-end; gap: 1vmin; text-align: center; min-height: 0; overflow: hidden; }
+  body.captions #captions { display: flex; }
+  body.captions #stage { display: none; }
+  #captions .cap { font-family: var(--display-font), Inter, sans-serif; font-weight: 700; color: #fff; line-height: 1.15; letter-spacing: .03em;
+    font-size: calc(6.5vmin * var(--scale)); text-shadow: 0 0 18px rgba(var(--glow-2), .85), 0 0 46px rgba(var(--glow-3), .7); text-wrap: balance; }
+  #captions .cap.old { color: rgba(230,244,255,.5); text-shadow: none; font-weight: 500; font-size: calc(4vmin * var(--scale)); }
+  #controls button.listen.on { background: rgba(var(--glow-2), .35); border-color: var(--cyan-bright); box-shadow: 0 0 14px rgba(var(--glow-2), .6); }
   #controls button {
     font: 600 max(15px, 1.9vmin) Inter, -apple-system, sans-serif;
     color: var(--text); background: rgba(33, 150, 243, 0.14);
@@ -303,6 +317,7 @@
       <span class="tag" id="tag">connecting</span>
     </header>
     <section id="stage" aria-live="polite" aria-atomic="true"></section>
+    <section id="captions" aria-live="polite"></section>
     <footer>
       <div id="bar"><div id="fill"></div></div>
       <div id="times"><span id="tcur">0:00</span><span id="tdur">0:00</span></div>
@@ -320,6 +335,8 @@
     <button data-cmd="pin" data-app title="Keep above other windows">On top</button>
     <button data-cmd="glass" data-app title="See-through window">Glass</button>
     <button data-cmd="fx" title="Continuous glow animation (uses more graphics power)">Effects</button>
+    <button data-cmd="listen" class="listen" title="Listen to whatever the Mac is playing: identify songs and caption speech">Listen</button>
+    <button data-cmd="theme" title="Next colour theme">Theme</button>
     <button data-cmd="cast" title="Show the address to open on a TV or another device">Cast</button>
     <button data-cmd="hide" title="Hide these buttons (h); move the mouse to bring them back">Hide</button>
     <button data-cmd="close" data-app class="danger" title="Close this window">Close</button>
@@ -359,6 +376,8 @@
     hideControls: qs.get('controls') === '0',
     fx: qs.get('fx') === '1' || store('fx', false),
   };
+  const THEMES = ['blueguard', 'ember', 'violet', 'emerald', 'rose', 'mono'];
+  let listening = false;
   const bridge = window.webkit?.messageHandlers?.bluelyrics;
   const toApp = payload => { try { bridge?.postMessage(payload); } catch {} };
 
@@ -393,11 +412,27 @@
     const source = new EventSource('/events');
     source.addEventListener('track', e => onTrack(JSON.parse(e.data)));
     source.addEventListener('pos', e => onPos(JSON.parse(e.data)));
-    source.addEventListener('prefs', e => applyFont(JSON.parse(e.data)));
+    source.addEventListener('prefs', e => { const p = JSON.parse(e.data); applyFont(p); applyTheme(p.prefs?.theme); });
+    source.addEventListener('caption', e => onCaption(JSON.parse(e.data)));
+    source.addEventListener('listen', e => { listening = JSON.parse(e.data).state === 'listening'; controls.querySelector('[data-cmd="listen"]')?.classList.toggle('on', listening); if (!listening) body.classList.remove('captions'); });
     source.onopen = () => { el.tag.textContent = 'live'; };
     source.onerror = () => { el.tag.textContent = 'reconnecting'; };
   }
 
+  function applyTheme(name) {
+    document.documentElement.dataset.theme = THEMES.includes(name) ? name : 'blueguard';
+  }
+  let captionLines = [];
+  function onCaption(c) {
+    if (!c.text) return;
+    if (!track || !track.lines?.length || track.status !== 'playing') body.classList.add('captions');   // no song: show captions
+    const box = document.getElementById('captions');
+    if (c.final) { captionLines.push(c.text); captionLines = captionLines.slice(-3); }
+    const parts = [...captionLines.slice(0, c.final ? undefined : -0)];
+    box.replaceChildren(...captionLines.slice(c.final ? 0 : -2).map(tx => { const d = document.createElement('div'); d.className = 'cap old'; d.textContent = tx; return d; }));
+    if (!c.final) { const d = document.createElement('div'); d.className = 'cap'; d.textContent = c.text; box.appendChild(d); }
+    else { const last = box.lastElementChild; if (last) last.className = 'cap'; }
+  }
   const registered = new Set(['Cinzel']);
   function applyFont({ prefs, fonts }) {
     const key = prefs?.font && fonts?.[prefs.font] ? prefs.font : 'cinzel';
@@ -415,6 +450,7 @@
   }
   function onTrack(t) {
     track = t;
+    if (t.lines?.length && t.status === 'playing') body.classList.remove('captions');
     onPos(t);
     el.title.textContent = t.title || 'BlueLyrics';
     el.artist.textContent = t.artist ? '· ' + t.artist : '';
@@ -567,11 +603,11 @@
     const e = g * g;                                  // ease-out so the head stays hot
     const white = 0.45 + 0.55 * e;
     const shadow = [
-      `0 0 ${(14 + 16 * e).toFixed(1)}px rgba(128,229,255,${(0.9 * e + 0.1).toFixed(2)})`,
-      `0 0 ${(20 + 40 * e).toFixed(1)}px rgba(0,212,255,${(0.8 * e).toFixed(2)})`,
-      `${(-0.3 - 0.5 * e).toFixed(2)}em 0 ${(18 + 24 * e).toFixed(1)}px rgba(0,212,255,${(0.45 * e).toFixed(2)})`,
-      `${(-0.7 - 0.9 * e).toFixed(2)}em 0 ${(30 + 34 * e).toFixed(1)}px rgba(33,150,243,${(0.35 * e).toFixed(2)})`,
-      `0 0 ${(60 + 60 * e).toFixed(0)}px rgba(33,150,243,${(0.5 * e).toFixed(2)})`,
+      `0 0 ${(14 + 16 * e).toFixed(1)}px rgba(var(--glow-1),${(0.9 * e + 0.1).toFixed(2)})`,
+      `0 0 ${(20 + 40 * e).toFixed(1)}px rgba(var(--glow-2),${(0.8 * e).toFixed(2)})`,
+      `${(-0.3 - 0.5 * e).toFixed(2)}em 0 ${(18 + 24 * e).toFixed(1)}px rgba(var(--glow-2),${(0.45 * e).toFixed(2)})`,
+      `${(-0.7 - 0.9 * e).toFixed(2)}em 0 ${(30 + 34 * e).toFixed(1)}px rgba(var(--glow-3),${(0.35 * e).toFixed(2)})`,
+      `0 0 ${(60 + 60 * e).toFixed(0)}px rgba(var(--glow-3),${(0.5 * e).toFixed(2)})`,
     ].join(', ');
     return { color: `rgba(255,255,255,${white.toFixed(2)})`, shadow };
   }
@@ -702,6 +738,10 @@
       case 'fullscreen': toggleFullscreen(); break;
       case 'cast': showCast(); break;
       case 'fx': settings.fx = !settings.fx; save('fx', settings.fx); applyLayout(); break;
+      case 'listen': fetch('/listen', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ on: !listening }) })
+        .then(r => r.json()).then(j => { if (j.error) el.tag.textContent = 'listen: ' + j.error; }).catch(() => {}); break;
+      case 'theme': { const cur = document.documentElement.dataset.theme || 'blueguard'; const next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+        fetch('/prefs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ theme: next }) }).catch(() => {}); applyTheme(next); break; }
       case 'hide': userHid ? revealControls() : hideControls(); break;
       default: toApp({ cmd }); // nextScreen, allScreens, pin, glass, close
     }

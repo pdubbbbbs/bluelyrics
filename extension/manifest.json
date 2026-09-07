@@ -1,16 +1,24 @@
 {
   "manifest_version": 3,
   "name": "BlueLyrics Reporter",
-  "version": "0.2",
-  "description": "Sends what YouTube / YouTube Music is playing to the local BlueLyrics lyrics window.",
+  "version": "0.3",
+  "description": "Sends what YouTube Music, Amazon Music, Pandora, YouTube and other players are playing, plus their own lyrics or captions, to the local BlueLyrics window.",
   "permissions": [],
   "host_permissions": ["http://127.0.0.1:7331/*", "http://localhost:7331/*"],
   "background": { "service_worker": "background.js" },
   "content_scripts": [
     {
-      "matches": ["https://music.youtube.com/*", "https://www.youtube.com/*"],
+      "matches": ["https://music.youtube.com/*", "https://www.youtube.com/*", "https://music.amazon.com/*", "https://www.pandora.com/*",
+                  "https://www.netflix.com/*", "https://www.primevideo.com/*", "https://www.amazon.com/gp/video/*", "https://open.spotify.com/*"],
       "js": ["content.js"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["youtube-main.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
     },
     {
       "matches": ["https://music.apple.com/*"],

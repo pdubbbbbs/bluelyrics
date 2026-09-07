@@ -211,7 +211,7 @@ def load_prefs() -> dict:
 
 
 def save_prefs(update: dict) -> dict:
-  prefs = {**load_prefs(), **{k: v for k, v in update.items() if k in ("font",)}}
+  prefs = {**load_prefs(), **{k: v for k, v in update.items() if k in ("font", "theme")}}
   if prefs.get("font") not in FONTS:
     prefs.pop("font", None)
   PREFS_PATH.parent.mkdir(parents=True, exist_ok=True)
