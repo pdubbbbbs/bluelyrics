@@ -58,8 +58,8 @@
     card.innerHTML = `
       <div class="meta"><span class="name">${font.name}</span><span class="note">${notes[key] || ''}</span>
         <button class="${key === current ? 'on' : ''}">${key === current ? 'In use' : 'Use this font'}</button></div>
-      <div class="sample" style="font-family:'${font.name}'">You wonda why they <span class="dim">call U</span> bitch.
-        <small>Then they came asking me my name · The quick brown fox jumps over the lazy dog</small></div>`;
+      <div class="sample" style="font-family:'${font.name}'">Lean on me, <span class="dim">when you're</span> not strong
+        <small>And I'll be your friend, I'll help you carry on · The quick brown fox jumps over the lazy dog</small></div>`;
     card.querySelector('button').addEventListener('click', async () => {
       const r = await fetch('/prefs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ font: key }) });
       if (!r.ok) { status.textContent = 'could not save'; status.classList.add('show'); return; }
