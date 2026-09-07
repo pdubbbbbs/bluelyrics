@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlueLyrics fonts</title>
+<style>
+  :root { --bg-0:#040d1a; --bg-1:#0a1628; --cyan:#00d4ff; --cyan-bright:#80e5ff; --border:rgba(77,201,246,.35); --text:#e6f4ff; --muted:rgba(230,244,255,.6); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background: radial-gradient(120% 80% at 50% 0%, var(--bg-1), var(--bg-0) 70%); color:var(--text); font-family: Inter,-apple-system,sans-serif; padding: 4vmin; min-height:100vh; }
+  h1 { font-size: 3.2vmin; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom: 1vmin; }
+  p.lead { color: var(--muted); font-size: 2.2vmin; margin-bottom: 3vmin; max-width: 70ch; }
+  .card { border:1px solid var(--border); border-radius:20px; padding: 3vmin 4vmin; margin-bottom: 3vmin; background: rgba(13,31,51,.6); box-shadow: 0 0 40px rgba(0,212,255,.12); }
+  .card.current { border-color: var(--cyan-bright); box-shadow: 0 0 40px rgba(0,212,255,.35); }
+  .meta { display:flex; align-items:center; gap: 2vmin; flex-wrap: wrap; margin-bottom: 1.5vmin; }
+  .name { font-size: 2.6vmin; font-weight: 600; }
+  .note { color: var(--muted); font-size: 1.9vmin; }
+  button { font: 600 max(16px, 2vmin) Inter, sans-serif; color: var(--text); background: rgba(33,150,243,.14); border: 1px solid rgba(77,201,246,.45); border-radius: 12px; padding: .8em 1.4em; min-height: 48px; cursor: pointer; margin-left:auto; }
+  button:hover, button:focus-visible { background: rgba(0,212,255,.28); border-color: var(--cyan-bright); box-shadow: 0 0 14px rgba(0,212,255,.55); outline:none; }
+  button.on { background: rgba(0,212,255,.35); border-color: var(--cyan-bright); }
+  .sample { font-size: 7.5vmin; line-height: 1.1; font-weight: 700; color:#fff; letter-spacing: .03em; text-wrap: balance;
+    text-shadow: 0 0 6px rgba(128,229,255,.95), 0 0 18px rgba(0,212,255,.85), 0 0 46px rgba(33,150,243,.7); }
+  .sample .dim { color: rgba(230,244,255,.45); text-shadow:none; font-weight:400; }
+  .sample small { display:block; font-size: 3.4vmin; font-weight: 400; color: var(--muted); text-shadow:none; margin-top: .4em; }
+  #status { position: fixed; left:50%; bottom: 2vmin; transform: translateX(-50%); background: rgba(6,16,30,.9); border:1px solid var(--border); border-radius: 999px; padding: .6em 1.4em; font-size: 2vmin; color: var(--cyan-bright); opacity:0; transition: opacity .3s; }
+  #status.show { opacity: 1; }
+</style></head>
+<body>
+  <h1>BlueLyrics display fonts</h1>
+  <p class="lead">Every face below is a true small caps design with an open licence, bundled inside the app and served to cast screens. Press "Use this font" and the lyrics window switches immediately.</p>
+  <div id="list"></div>
+  <div id="status"></div>
+<script>
+(async () => {
+  const notes = {
+    'cinzel': 'Felix Titling family. Roman inscription capitals, variable weight 400 to 900. Current default.',
+    'alegreya-sans-sc': 'Sans small caps with a real bold. Closest in spirit to Bank Gothic among open faces; clean at any size.',
+    'carrois-gothic-sc': 'Gothic sans small caps, single weight. Narrow and engineered, very legible.',
+    'marcellus-sc': 'Trajan-style serif small caps, single weight. Elegant and quiet.',
+    'playfair-display-sc': 'High-contrast display serif with real bold. Dramatic thick and thin strokes.',
+    'vollkorn-sc': 'Sturdy book serif small caps with real bold. Warm, heavy, reads well when large.',
+    'bona-nova-sc': 'Modern serif small caps with real bold. Sharp and cinematic.',
+    'alegreya-sc': 'Calligraphic serif small caps with real bold. Lively rhythm, very readable.',
+    'cormorant-sc': 'Garamond-style display serif small caps with real bold. Fine and tall.',
+    'overlock-sc': 'Rounded, slightly playful small caps, single weight. Soft edges, friendly.',
+    'mate-sc': 'Classic transitional serif small caps, single weight. Quiet and formal.',
+    'diplomata-sc': 'Ultra-wide engraved-style capitals, single weight. Bold poster look, Bank Gothic width.',
+  };
+  const { prefs, fonts } = await (await fetch('/prefs')).json();
+  const list = document.getElementById('list');
+  const status = document.getElementById('status');
+  const current = prefs.font || 'cinzel';
+  for (const [key, font] of Object.entries(fonts)) {
+    for (const [weight, file] of Object.entries(font.files)) {
+      const face = new FontFace(font.name, `url(/fonts/${encodeURIComponent(file)})`, { weight, display: 'swap' });
+      document.fonts.add(face); face.load().catch(() => {});
+    }
+    const card = document.createElement('section');
+    card.className = 'card' + (key === current ? ' current' : '');
+    card.dataset.key = key;
+    card.innerHTML = `
+      <div class="meta"><span class="name">${font.name}</span><span class="note">${notes[key] || ''}</span>
+        <button class="${key === current ? 'on' : ''}">${key === current ? 'In use' : 'Use this font'}</button></div>
+      <div class="sample" style="font-family:'${font.name}'">You wonda why they <span class="dim">call U</span> bitch.
+        <small>Then they came asking me my name · The quick brown fox jumps over the lazy dog</small></div>`;
+    card.querySelector('button').addEventListener('click', async () => {
+      const r = await fetch('/prefs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ font: key }) });
+      if (!r.ok) { status.textContent = 'could not save'; status.classList.add('show'); return; }
+      document.querySelectorAll('.card').forEach(c => { c.classList.toggle('current', c === card); const b = c.querySelector('button'); b.classList.toggle('on', c === card); b.textContent = c === card ? 'In use' : 'Use this font'; });
+      status.textContent = `${font.name} is now the lyrics font`; status.classList.add('show');
+      setTimeout(() => status.classList.remove('show'), 2500);
+    });
+    list.appendChild(card);
+  }
+})();
+</script>
+</body></html>
