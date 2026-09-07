@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
   <key>CFBundleDevelopmentRegion</key><string>en</string>
-  <key>CFBundleExecutable</key><string>LyricGlow</string>
+  <key>CFBundleExecutable</key><string>BlueLyrics</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
-  <key>CFBundleIdentifier</key><string>com.blueguard.lyricglow</string>
+  <key>CFBundleIdentifier</key><string>com.blueguard.bluelyrics</string>
   <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
-  <key>CFBundleName</key><string>LyricGlow</string>
-  <key>CFBundleDisplayName</key><string>LyricGlow</string>
+  <key>CFBundleName</key><string>BlueLyrics</string>
+  <key>CFBundleDisplayName</key><string>BlueLyrics</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>0.2</string>
   <key>CFBundleVersion</key><string>2</string>
@@ -16,6 +16,6 @@
   <key>NSHighResolutionCapable</key><true/>
   <key>NSAppTransportSecurity</key>
   <dict><key>NSAllowsLocalNetworking</key><true/></dict>
-  <key>NSAppleEventsUsageDescription</key><string>LyricGlow reads the current track from Music to show its lyrics.</string>
+  <key>NSAppleEventsUsageDescription</key><string>BlueLyrics reads the current track from Music to show its lyrics.</string>
 </dict>
 </plist>

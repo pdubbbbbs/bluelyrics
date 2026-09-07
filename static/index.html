@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LyricGlow</title>
+<title>BlueLyrics</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -141,6 +141,7 @@
   @keyframes pulse { 50% { opacity: 0.55; transform: scale(0.85); } }
   header .title { color: var(--text); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   header .artist { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .brand { color: var(--cyan-soft); font-weight: 600; letter-spacing: 0.12em; opacity: 0.75; white-space: nowrap; }
   header .tag {
     margin-left: auto; font-size: 0.8em; padding: 0.15em 0.7em;
     border: 1px solid var(--border); border-radius: 999px;
@@ -297,7 +298,8 @@
   <main id="card" aria-label="Now playing lyrics">
     <header>
       <span class="dot off" id="dot"></span>
-      <span class="title" id="title">LyricGlow</span>
+      <span class="title" id="title">BlueLyrics</span>
+      <span class="brand">BlueGuard</span>
       <span class="artist" id="artist"></span>
       <span class="tag" id="tag">connecting</span>
     </header>
@@ -307,7 +309,7 @@
       <div id="times"><span id="tcur">0:00</span><span id="tdur">0:00</span></div>
     </footer>
   </main>
-  <nav id="controls" aria-label="LyricGlow controls">
+  <nav id="controls" aria-label="BlueLyrics controls">
     <button data-cmd="smaller" title="Smaller text (−)">A−</button>
     <button data-cmd="bigger" title="Bigger text (+)">A+</button>
     <button data-cmd="lines" title="Context lines (l)">Lines</button>
@@ -358,7 +360,7 @@
     hideControls: qs.get('controls') === '0',
     fx: qs.get('fx') === '1' || store('fx', false),
   };
-  const bridge = window.webkit?.messageHandlers?.lyricglow;
+  const bridge = window.webkit?.messageHandlers?.bluelyrics;
   const toApp = payload => { try { bridge?.postMessage(payload); } catch {} };
 
   const body = document.body;
@@ -415,7 +417,7 @@
   function onTrack(t) {
     track = t;
     onPos(t);
-    el.title.textContent = t.title || 'LyricGlow';
+    el.title.textContent = t.title || 'BlueLyrics';
     el.artist.textContent = t.artist ? '· ' + t.artist : '';
     el.tdur.textContent = fmt(t.duration);
     if (t.has_art) {
@@ -720,7 +722,7 @@
   });
   window.addEventListener('resize', () => { renderedKey = ''; render(true); });
   document.fonts?.ready.then(() => { renderedKey = ''; render(true); });
-  window.lyricglow = { reveal: revealControls, setState(state) { Object.assign(settings, state); applyLayout(); renderedKey = ''; render(true); },
+  window.bluelyrics = { reveal: revealControls, setState(state) { Object.assign(settings, state); applyLayout(); renderedKey = ''; render(true); },
     markButtons(flags) { for (const [cmd, on] of Object.entries(flags)) controls.querySelector(`[data-cmd="${cmd}"]`)?.classList.toggle('on', on); } };
   setControls(!userHid);
   window.addEventListener('resize', reserveControls);

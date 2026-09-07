@@ -1,4 +1,6 @@
-# LyricGlow
+# BlueLyrics
+
+A BlueGuard Security app by Philip S. Wright. MIT licensed.
 
 A floating, glowing lyrics window for Music.app (and YouTube / YouTube Music
 through a small Brave extension), styled after bluetoothdefense.com. Lyrics
@@ -7,11 +9,11 @@ page can be opened by any browser on the LAN, so it goes wherever you cast.
 
 ## Start / stop
 
-    ./lyricglow.sh start          # server + one window, left half of the main display
-    ./lyricglow.sh start --all    # a window on every display
-    ./lyricglow.sh stop
-    ./lyricglow.sh status         # what is running, plus the cast addresses
-    ./lyricglow.sh server         # server only (cast-only use, no window)
+    ./bluelyrics.sh start          # server + one window, left half of the main display
+    ./bluelyrics.sh start --all    # a window on every display
+    ./bluelyrics.sh stop
+    ./bluelyrics.sh status         # what is running, plus the cast addresses
+    ./bluelyrics.sh server         # server only (cast-only use, no window)
 
 The menu-bar ♪ item lists every display; pick one to open or close a window
 there, or "Show on every display". Quit from that menu.
@@ -32,7 +34,7 @@ open this address in any browser, on a phone, tablet, laptop or TV browser:
     http://10.10.10.169:7331/
 
 (That is the Mac's wired address. On Wi-Fi the Mac also answers at
-http://10.10.31.123:7331/. `./lyricglow.sh url` prints whatever is current,
+http://10.10.31.123:7331/. `./bluelyrics.sh url` prints whatever is current,
 and the Cast button in the window shows it in large type for the room.)
 
 Double-click the page for full screen. Text size, sync offset and line count
@@ -55,7 +57,7 @@ the lyric lookup.
 With the extension loaded, open https://music.apple.com in Brave while
 signed in. The extension reads the session tokens the site already uses and
 hands them to the server (stored with owner-only permissions in
-~/Library/Application Support/LyricGlow/apple-tokens.json). From then on
+~/Library/Application Support/BlueLyrics/apple-tokens.json). From then on
 lyrics come from Apple first, with real per-word timing where Apple has it;
 the badge reads "synced · word timing". If the token expires, the log says
 so; reopen music.apple.com once.
@@ -75,7 +77,7 @@ Tracks with no lyrics anywhere (live intros, instrumentals) show the title.
   AppleScript, LRCLIB lookup, `/events` stream, `/state`, `/art`, `/info`,
   `POST /report` for the extension, `--demo FILE` to replay a cached lyric file.
 - `static/index.html` — the page.
-- `LyricGlow.swift` + `Info.plist` — native floating window app (built by
-  `lyricglow.sh build`). `LyricGlow.v1-fullscreen-default.swift` is the first
+- `BlueLyrics.swift` + `Info.plist` — native floating window app (built by
+  `bluelyrics.sh build`). `BlueLyrics.v1-fullscreen-default.swift` is the first
   version, kept for reference; `server.v1-music-only.py` likewise.
 - `extension/` — Brave/Chrome MV3 reporter for YouTube and YouTube Music.

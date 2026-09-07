@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "LyricGlow Reporter",
+  "name": "BlueLyrics Reporter",
   "version": "0.2",
-  "description": "Sends what YouTube / YouTube Music is playing to the local LyricGlow lyrics window.",
+  "description": "Sends what YouTube / YouTube Music is playing to the local BlueLyrics lyrics window.",
   "permissions": [],
   "host_permissions": ["http://127.0.0.1:7331/*", "http://localhost:7331/*"],
   "background": { "service_worker": "background.js" },

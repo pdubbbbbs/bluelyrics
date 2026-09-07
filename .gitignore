@@ -1,7 +1,7 @@
 # build products and local state
-LyricGlow
-LyricGlow.app/
-LyricGlow.app.previous-*/
+BlueLyrics
+BlueLyrics.app/
+BlueLyrics.app.previous-*/
 *.building/
 cache/
 __pycache__/
@@ -10,6 +10,6 @@ __pycache__/
 # dated working copies kept locally, not in history
 static/index.v*.html
 server.v*.py
-LyricGlow.v*.swift
+BlueLyrics.v*.swift
 # release zips
 dist/

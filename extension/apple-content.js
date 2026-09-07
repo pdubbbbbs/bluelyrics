@@ -6,7 +6,7 @@
   (document.head || document.documentElement).appendChild(script);
   let sent = '';
   window.addEventListener('message', event => {
-    if (event.source !== window || !event.data || event.data.type !== 'lyricglow-apple-tokens') return;
+    if (event.source !== window || !event.data || event.data.type !== 'bluelyrics-apple-tokens') return;
     if (event.data.musicUserToken === sent) return;
     sent = event.data.musicUserToken;
     chrome.runtime.sendMessage({ type: 'apple-tokens', payload: {

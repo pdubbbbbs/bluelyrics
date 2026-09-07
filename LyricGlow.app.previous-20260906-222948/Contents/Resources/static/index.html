@@ -1,0 +1,711 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LyricGlow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-0: #040d1a;
+    --bg-1: #0a1628;
+    --card: rgba(13, 31, 51, 0.62);
+    --border: rgba(77, 201, 246, 0.35);
+    --cyan: #00d4ff;
+    --cyan-soft: #4dc9f6;
+    --cyan-bright: #80e5ff;
+    --blue: #2196f3;
+    --blue-deep: #1565c0;
+    --violet: #ac4bff;
+    --text: #e6f4ff;
+    --muted: rgba(230, 244, 255, 0.55);
+    --scale: 1;
+    --card-w: 100vw;
+    --card-h: 100vh;
+    --radius: 0px;
+  }
+  /* Display faces are registered from the server's font list (see applyFont). Default: Cinzel. */
+  @font-face { font-family: "Cinzel"; src: url("/fonts/Cinzel%5Bwght%5D.ttf") format("truetype"); font-weight: 400 900; font-display: swap; }
+  :root { --display-font: "Cinzel"; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { user-select: none; -webkit-user-select: none; }
+  html, body { height: 100%; width: 100%; overflow: hidden; }
+  body {
+    font-family: var(--display-font), "Felix Titling", "Bank Gothic", Inter, -apple-system, sans-serif;
+    color: var(--text);
+    background: radial-gradient(120% 80% at 50% 0%, var(--bg-1) 0%, var(--bg-0) 70%);
+    display: grid; place-items: center;
+    cursor: none;
+  }
+  body.transparent { background: transparent; }
+  body.show-cursor { cursor: default; }
+
+  /* ambient artwork */
+  #art {
+    position: fixed; inset: -12%;
+    background-size: cover; background-position: center;
+    filter: blur(60px) saturate(1.6) brightness(0.45);
+    opacity: 0; transition: opacity 2s ease;
+    pointer-events: none;
+  }
+  #art.on { opacity: 0.55; }
+  body.transparent #art { display: none; }
+
+  /* drifting glow orbs */
+  .orb {
+    position: fixed; border-radius: 50%;
+    filter: blur(90px); opacity: 0.45; pointer-events: none;
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+  .orb.a { width: 55vmax; height: 55vmax; left: -15vmax; top: -20vmax;
+    background: radial-gradient(circle, var(--cyan) 0%, transparent 65%);
+    animation: drift-a 26s ease-in-out infinite alternate; }
+  .orb.b { width: 50vmax; height: 50vmax; right: -18vmax; bottom: -22vmax;
+    background: radial-gradient(circle, var(--blue) 0%, transparent 65%);
+    animation: drift-b 31s ease-in-out infinite alternate; }
+  .orb.c { width: 35vmax; height: 35vmax; left: 40vw; top: 55vh;
+    background: radial-gradient(circle, var(--violet) 0%, transparent 65%);
+    opacity: 0.22; animation: drift-c 37s ease-in-out infinite alternate; }
+  body.transparent .orb { display: none; }
+  @keyframes drift-a { to { transform: translate(18vw, 14vh) scale(1.15); } }
+  @keyframes drift-b { to { transform: translate(-16vw, -18vh) scale(1.2); } }
+  @keyframes drift-c { to { transform: translate(-22vw, -30vh) scale(0.85); } }
+
+  /* the floating card */
+  #card {
+    position: relative;
+    width: var(--card-w); height: var(--card-h);
+    border-radius: var(--radius);
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow:
+      0 0 0 1px rgba(0, 212, 255, 0.08) inset,
+      0 0 40px rgba(0, 212, 255, 0.18),
+      0 0 120px rgba(33, 150, 243, 0.16),
+      0 30px 80px rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(24px) saturate(1.3);
+    -webkit-backdrop-filter: blur(24px) saturate(1.3);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: calc(2.2vmin * var(--scale)) calc(4vmin * var(--scale));
+    overflow: hidden;
+    animation: float 9s ease-in-out infinite;
+    transition: box-shadow 0.9s ease;
+  }
+  body.floating #card { --radius: 28px; }
+  body.transparent #card { background: rgba(6, 16, 30, 0.72); }
+  #card.pulse {
+    box-shadow:
+      0 0 0 1px rgba(128, 229, 255, 0.35) inset,
+      0 0 70px rgba(0, 212, 255, 0.45),
+      0 0 180px rgba(33, 150, 243, 0.35),
+      0 30px 80px rgba(0, 0, 0, 0.55);
+    transition: box-shadow 0.12s ease;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(calc(-0.6vmin * var(--float-amp, 1))); }
+  }
+  body.fill #card { animation: none; }
+
+  /* circuit trace hints, like the site favicon */
+  #card::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(var(--cyan-soft), var(--cyan-soft)) 6% 82% / 9% 1px no-repeat,
+      linear-gradient(var(--cyan-soft), var(--cyan-soft)) 15% 74% / 1px 8% no-repeat,
+      linear-gradient(var(--cyan-soft), var(--cyan-soft)) 88% 14% / 9% 1px no-repeat,
+      linear-gradient(var(--cyan-soft), var(--cyan-soft)) 79% 14% / 1px 10% no-repeat;
+    opacity: 0.16;
+  }
+
+  header {
+    display: flex; align-items: center; gap: 1.2vmin;
+    font-size: calc(2.1vmin * var(--scale));
+    letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--muted); font-weight: 500;
+    min-height: 1.5em;
+  }
+  header .dot {
+    width: 0.9em; height: 0.9em; border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 10px var(--cyan), 0 0 24px var(--blue);
+    animation: pulse 2.2s ease-in-out infinite;
+    flex: none;
+  }
+  header .dot.paused { background: #ffb347; box-shadow: 0 0 10px #ffb347; animation: none; }
+  header .dot.off { background: #556; box-shadow: none; animation: none; }
+  @keyframes pulse { 50% { opacity: 0.55; transform: scale(0.85); } }
+  header .title { color: var(--text); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .artist { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header .tag {
+    margin-left: auto; font-size: 0.8em; padding: 0.15em 0.7em;
+    border: 1px solid var(--border); border-radius: 999px;
+    color: var(--cyan-soft); white-space: nowrap;
+  }
+
+  #stage {
+    position: relative; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    min-height: 0; overflow: hidden;
+    gap: calc(1.4vmin * var(--scale));
+  }
+  .line {
+    width: 100%;
+    font-family: var(--display-font), "Felix Titling", "Bank Gothic", Inter, sans-serif;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+    color: var(--muted);
+    line-height: 1.15;
+    text-wrap: balance;
+    opacity: 0.55;
+    transition: opacity 0.5s ease, transform 0.5s ease, color 0.5s ease;
+    font-size: calc(4.2vmin * var(--scale));
+  }
+  .line.far { opacity: 0.28; }
+  .line.now {
+    font-weight: 800;
+    color: #ffffff;
+    opacity: 1;
+    text-shadow:
+      0 0 6px rgba(128, 229, 255, 0.95),
+      0 0 18px rgba(0, 212, 255, 0.85),
+      0 0 46px rgba(33, 150, 243, 0.7),
+      0 0 110px rgba(33, 150, 243, 0.45);
+    animation: glow 3.4s ease-in-out infinite;
+  }
+  .line.enter { animation: rise 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), glow 3.4s ease-in-out infinite; }
+  @keyframes rise { from { opacity: 0; transform: translateY(0.35em) scale(0.97); } }
+  @keyframes glow {
+    50% { text-shadow:
+      0 0 8px rgba(128, 229, 255, 1),
+      0 0 26px rgba(0, 212, 255, 1),
+      0 0 64px rgba(33, 150, 243, 0.85),
+      0 0 140px rgba(33, 150, 243, 0.55); }
+  }
+  .line.idle { font-weight: 300; color: var(--muted); opacity: 0.8; }
+  .line.now .w {
+    display: inline-block; white-space: pre;
+    color: rgba(230, 244, 255, 0.38);
+    text-shadow: none;
+    transition: color 0.12s ease, text-shadow 0.12s ease, transform 0.12s ease;
+  }
+  .line.now .w.sung { transition: transform 0.4s ease-out; }
+  .line.now .w.singing {
+    color: #ffffff; transform: scale(1.06);
+    text-shadow:
+      0 0 8px #ffffff,
+      0 0 22px rgba(128, 229, 255, 1),
+      0 0 50px rgba(0, 212, 255, 1),
+      0 0 120px rgba(33, 150, 243, 0.8);
+  }
+  .line.now.words { text-shadow: none; animation: none; }
+
+  footer { display: grid; gap: 0.8vmin; }
+  #bar {
+    height: max(4px, 0.5vmin); border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08); overflow: hidden;
+  }
+  #fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--blue-deep), var(--cyan), var(--cyan-bright));
+    box-shadow: 0 0 12px var(--cyan), 0 0 28px var(--blue);
+    transition: width 0.3s linear;
+  }
+  #times {
+    display: flex; justify-content: space-between;
+    font-size: calc(1.8vmin * var(--scale)); color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  #hint {
+    position: fixed; left: 50%; bottom: 2vmin; transform: translateX(-50%);
+    font-size: 1.6vmin; color: var(--muted); opacity: 0; transition: opacity 0.4s;
+    white-space: nowrap; pointer-events: none;
+  }
+  body.show-cursor #hint { opacity: 0.8; }
+  /* control bar */
+  #controls {
+    position: fixed; left: 50%; bottom: 3vmin; transform: translateX(-50%);
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8vmin;
+    max-width: 96vw; padding: 1vmin 1.2vmin;
+    background: rgba(6, 16, 30, 0.82);
+    border: 1px solid var(--border); border-radius: 18px;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.18), 0 12px 40px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    z-index: 10;
+  }
+  #controls.hidden { opacity: 0; transform: translate(-50%, 20px); pointer-events: none; }
+  body.controls-open #card { padding-bottom: calc(var(--controls-h, 0px) + 4vmin); }
+  #reveal {
+    position: fixed; left: 50%; bottom: 1.2vmin; transform: translateX(-50%);
+    font: 600 max(15px, 1.8vmin) Inter, -apple-system, sans-serif;
+    color: var(--cyan-bright); background: rgba(6, 16, 30, 0.85);
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 0.6em 1.4em; min-height: 40px; cursor: pointer; z-index: 11;
+    box-shadow: 0 0 18px rgba(0, 212, 255, 0.35);
+  }
+  #reveal[hidden] { display: none; }
+  #controls button {
+    font: 600 max(15px, 1.9vmin) Inter, -apple-system, sans-serif;
+    color: var(--text); background: rgba(33, 150, 243, 0.14);
+    border: 1px solid rgba(77, 201, 246, 0.45); border-radius: 12px;
+    padding: 0.9em 1.2em; min-height: 44px; cursor: pointer;
+    letter-spacing: 0.02em;
+  }
+  #controls button:hover, #controls button:focus-visible {
+    background: rgba(0, 212, 255, 0.28); border-color: var(--cyan-bright);
+    box-shadow: 0 0 14px rgba(0, 212, 255, 0.55); outline: none;
+  }
+  #controls button.on { background: rgba(0, 212, 255, 0.35); border-color: var(--cyan-bright); }
+  #controls button.danger { border-color: rgba(235, 77, 77, 0.6); }
+  body:not(.app) [data-app] { display: none; }
+  body.show-cursor { cursor: default; }
+  body.chrome #card { padding-top: calc(2.2vmin * var(--scale) + 30px); }
+
+  #cast {
+    position: fixed; inset: 0; display: none; place-items: center;
+    background: rgba(4, 13, 26, 0.9); z-index: 20; text-align: center; padding: 4vmin;
+  }
+  #cast.open { display: grid; }
+  #cast h2 { font-size: 4vmin; font-weight: 600; color: var(--cyan-soft); margin-bottom: 2vmin; }
+  #cast .url {
+    font-size: 5vmin; font-weight: 700; color: #fff; margin: 1vmin 0;
+    text-shadow: 0 0 18px rgba(0, 212, 255, 0.8); font-variant-numeric: tabular-nums;
+    user-select: all; -webkit-user-select: all;
+  }
+  #cast p { color: var(--muted); font-size: 2.4vmin; max-width: 60ch; margin: 2vmin auto 0; line-height: 1.5; }
+  #cast button { margin-top: 3vmin; }
+
+  /* calm mode (default): no continuous animation, no live backdrop blur */
+  body:not(.fx) .orb, body:not(.fx) #card, body:not(.fx) .line.now, body:not(.fx) header .dot { animation: none !important; }
+  body:not(.fx) .line.enter { animation: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) !important; }
+  body:not(.fx) #card, body:not(.fx) #controls { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  body:not(.fx) .orb { filter: blur(60px); opacity: 0.32; }
+  body:not(.fx) #art { filter: blur(40px) saturate(1.4) brightness(0.4); }
+  @media (prefers-reduced-motion: reduce) {
+    .orb, #card, .line.now, header .dot { animation: none !important; }
+  }
+</style>
+</head>
+<body class="fill">
+  <div id="art"></div>
+  <div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+  <main id="card" aria-label="Now playing lyrics">
+    <header>
+      <span class="dot off" id="dot"></span>
+      <span class="title" id="title">LyricGlow</span>
+      <span class="artist" id="artist"></span>
+      <span class="tag" id="tag">connecting</span>
+    </header>
+    <section id="stage" aria-live="polite" aria-atomic="true"></section>
+    <footer>
+      <div id="bar"><div id="fill"></div></div>
+      <div id="times"><span id="tcur">0:00</span><span id="tdur">0:00</span></div>
+    </footer>
+  </main>
+  <nav id="controls" aria-label="LyricGlow controls">
+    <button data-cmd="smaller" title="Smaller text (−)">A−</button>
+    <button data-cmd="bigger" title="Bigger text (+)">A+</button>
+    <button data-cmd="lines" title="Context lines (l)">Lines</button>
+    <button data-cmd="offsetMinus" title="Show lyrics later ([)">Later</button>
+    <button data-cmd="offsetPlus" title="Show lyrics sooner (])">Sooner</button>
+    <button data-cmd="fullscreen" title="Fill this screen (f)">Fill screen</button>
+    <button data-cmd="nextScreen" data-app title="Move this window to the next display">Next display</button>
+    <button data-cmd="allScreens" data-app title="Open a window on every display">All displays</button>
+    <button data-cmd="pin" data-app title="Keep above other windows">On top</button>
+    <button data-cmd="glass" data-app title="See-through window">Glass</button>
+    <button data-cmd="fx" title="Continuous glow animation (uses more graphics power)">Effects</button>
+    <button data-cmd="cast" title="Show the address to open on a TV or another device">Cast</button>
+    <button data-cmd="hide" title="Hide these buttons (h); move the mouse to bring them back">Hide</button>
+    <button data-cmd="close" data-app class="danger" title="Close this window">Close</button>
+  </nav>
+  <button id="reveal" hidden title="Show the control bar (h)">Show controls</button>
+  <div id="cast" role="dialog" aria-label="Cast address">
+    <div>
+      <h2>Open this on any screen</h2>
+      <div id="castUrls"></div>
+      <p>Any browser on your network: a TV browser, a phone, a tablet, or a Brave tab you cast to a Chromecast or AirPlay target. Double-click the page there to go full screen.</p>
+      <button id="castClose">Back to lyrics</button>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const qs = new URLSearchParams(location.search);
+  const store = (key, fallback) => {
+    try { const v = localStorage.getItem('lg:' + key); return v === null ? fallback : JSON.parse(v); }
+    catch { return fallback; }
+  };
+  const save = (key, value) => { try { localStorage.setItem('lg:' + key, JSON.stringify(value)); } catch {} };
+
+  const settings = {
+    scale: Number(qs.get('scale') ?? store('scale', 1)),
+    offset: Number(qs.get('offset') ?? store('offset', 0)),      // ms, + shows lines earlier
+    lines: Number(qs.get('lines') ?? store('lines', 3)),          // context lines: 1, 3, 5
+    transparent: qs.get('transparent') === '1',
+    floating: qs.get('float') === '1',
+    width: Number(qs.get('w') ?? 78),                             // floating card % width
+    height: Number(qs.get('h') ?? 70),
+    chrome: qs.get('chrome') === '1',                             // native title strip above the page
+    hideControls: qs.get('controls') === '0',
+    fx: qs.get('fx') === '1' || store('fx', false),
+  };
+  const bridge = window.webkit?.messageHandlers?.lyricglow;
+  const toApp = payload => { try { bridge?.postMessage(payload); } catch {} };
+
+  const body = document.body;
+  const controls = document.getElementById('controls');
+  const el = Object.fromEntries(['art', 'card', 'dot', 'title', 'artist', 'tag', 'stage', 'fill', 'tcur', 'tdur']
+    .map(id => [id, document.getElementById(id)]));
+
+  function applyLayout() {
+    body.classList.toggle('transparent', settings.transparent);
+    body.classList.toggle('floating', settings.floating);
+    body.classList.toggle('fill', !settings.floating);
+    body.classList.toggle('chrome', settings.chrome);
+    body.classList.toggle('fx', settings.fx);
+    controls?.querySelector('[data-cmd="fx"]')?.classList.toggle('on', settings.fx);
+    body.classList.toggle('app', Boolean(bridge));
+    document.documentElement.style.setProperty('--scale', settings.scale);
+    document.documentElement.style.setProperty('--card-w', settings.floating ? settings.width + 'vw' : '100vw');
+    document.documentElement.style.setProperty('--card-h', settings.floating ? settings.height + 'vh' : '100vh');
+  }
+  applyLayout();
+
+  let track = null;          // last "track" payload
+  let base = 0, baseAt = 0;  // position anchor for interpolation
+  let playing = false;
+  let currentIndex = -1;
+  let renderedKey = '';
+
+  const fmt = s => { s = Math.max(0, Math.floor(s)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; };
+
+  function connect() {
+    const source = new EventSource('/events');
+    source.addEventListener('track', e => onTrack(JSON.parse(e.data)));
+    source.addEventListener('pos', e => onPos(JSON.parse(e.data)));
+    source.addEventListener('prefs', e => applyFont(JSON.parse(e.data)));
+    source.onopen = () => { el.tag.textContent = 'live'; };
+    source.onerror = () => { el.tag.textContent = 'reconnecting'; };
+  }
+
+  const registered = new Set(['Cinzel']);
+  function applyFont({ prefs, fonts }) {
+    const key = prefs?.font && fonts?.[prefs.font] ? prefs.font : 'cinzel';
+    const font = fonts?.[key] || { name: 'Cinzel', files: {} };
+    if (!registered.has(font.name)) {
+      for (const [weight, file] of Object.entries(font.files)) {
+        const face = new FontFace(font.name, `url(/fonts/${encodeURIComponent(file)})`, { weight, display: 'swap' });
+        document.fonts.add(face);
+        face.load().then(() => { renderedKey = ''; render(true); }).catch(() => {});
+      }
+      registered.add(font.name);
+    }
+    document.documentElement.style.setProperty('--display-font', `"${font.name}"`);
+    renderedKey = ''; render(true);
+  }
+  function onTrack(t) {
+    track = t;
+    onPos(t);
+    el.title.textContent = t.title || 'LyricGlow';
+    el.artist.textContent = t.artist ? '· ' + t.artist : '';
+    el.tdur.textContent = fmt(t.duration);
+    if (t.has_art) {
+      el.art.style.backgroundImage = `url(/art?v=${t.art_version})`;
+      el.art.classList.add('on');
+    } else {
+      el.art.classList.remove('on');
+    }
+    el.tag.textContent = t.status === 'off' ? 'music off'
+      : t.status === 'stopped' ? 'idle'
+      : t.lyrics_source === 'loading' ? 'finding lyrics'
+      : t.lyrics_source === 'none' ? 'no lyrics'
+      : t.lyrics_source === 'apple-words' ? 'synced · word timing'
+      : t.synced ? 'synced' : 'no timing · estimated';
+    currentIndex = -1;
+    renderedKey = '';
+    render(true);
+  }
+
+  function onPos(p) {
+    playing = p.status === 'playing';
+    // add the time the server spent between reading Music and sending this
+    const lag = (p.server_now && p.polled_at) ? Math.max(0, Math.min(1, p.server_now - p.polled_at)) : 0;
+    base = (p.position || 0) + (playing ? lag : 0);
+    baseAt = performance.now();
+    el.dot.className = 'dot ' + (playing ? '' : p.status === 'paused' ? 'paused' : 'off');
+  }
+
+  function position() {
+    const drift = playing ? (performance.now() - baseAt) / 1000 : 0;
+    return base + drift + settings.offset / 1000;
+  }
+
+  function pickIndex(lines, pos, duration, synced) {
+    if (!lines.length) return -1;
+    if (synced) {
+      let idx = -1;
+      for (let i = 0; i < lines.length; i++) { if (lines[i].t <= pos) idx = i; else break; }
+      return idx;
+    }
+    if (!duration) return 0;
+    return Math.min(lines.length - 1, Math.floor((pos / duration) * lines.length));
+  }
+
+  function render(force) {
+    if (!track) return;
+    const lines = track.lines || [];
+    const pos = position();
+    const idx = pickIndex(lines, pos, track.duration, track.synced);
+    const key = `${track.pid}|${idx}|${track.status}|${track.lyrics_source}`;
+    if (!force && key === renderedKey) return;
+    renderedKey = key;
+    const changed = idx !== currentIndex;
+    currentIndex = idx;
+
+    el.stage.replaceChildren();
+    if (track.status === 'off' || track.status === 'stopped') {
+      el.fill.style.width = '0%';
+      el.tcur.textContent = '0:00';
+      addLine('Music is idle', 'idle');
+    } else if (!lines.length) {
+      addLine(track.title || '', 'now');
+      addLine(track.lyrics_source === 'loading' ? 'finding lyrics…' : 'no lyrics found', 'idle');
+    } else {
+      const context = Math.max(0, Math.floor((settings.lines - 1) / 2));
+      const from = Math.max(0, idx - context);
+      const to = Math.min(lines.length - 1, Math.max(idx, 0) + context);
+      words = [];
+      if (idx < 0) addLine('♪', 'now');
+      for (let i = from; i <= to; i++) {
+        const cls = i === idx ? 'now' : Math.abs(i - idx) > 1 ? 'far' : '';
+        const lineEl = addLine(lines[i].text || '♪', cls);
+        if (i === idx && track.synced && lines[i].text) {
+          if (lines[i].words) {
+            buildTimedWords(lineEl, lines[i]);
+          } else {
+            const start = lines[i].t;
+            const next = lines.slice(i + 1).find(l => l.text)?.t;
+            const end = Math.min(lines[i].end ?? Infinity, next ?? start + 6, start + 12, track.duration || start + 12);
+            buildWords(lineEl, lines[i].text, start, end);
+          }
+        }
+      }
+    }
+    if (changed) {
+      const now = el.stage.querySelector('.now');
+      if (now) now.classList.add('enter');
+      el.card.classList.add('pulse');
+      setTimeout(() => el.card.classList.remove('pulse'), 250);
+    }
+    fitText();
+  }
+
+  function addLine(text, cls) {
+    const div = document.createElement('div');
+    div.className = 'line ' + cls;
+    div.textContent = text;
+    el.stage.appendChild(div);
+    return div;
+  }
+
+  // Per-word timing: LRCLIB gives line times only, so each word's slot is the
+  // line's span shared out by estimated syllables (plus a pause for punctuation).
+  let words = [];   // [{el, start, end}]
+  function syllables(word) {
+    const w = word.toLowerCase().replace(/[^a-z']/g, '');
+    if (!w) return 1;
+    const groups = (w.replace(/e$/, '').match(/[aeiouy]+/g) || []).length;
+    return Math.max(1, groups);
+  }
+  function buildTimedWords(lineEl, line) {
+    words = [];
+    lineEl.textContent = '';
+    lineEl.classList.add('words');
+    line.words.forEach((w, i) => {
+      const span = document.createElement('span');
+      span.className = 'w';
+      span.textContent = (i ? ' ' : '') + w.text;
+      lineEl.appendChild(span);
+      words.push({ el: span, start: w.t, end: Math.max(w.end || w.t + 0.3, w.t + 0.12) });
+    });
+  }
+  function buildWords(lineEl, text, start, end) {
+    words = [];
+    if (!(end > start)) return;
+    const tokens = text.split(/(\s+)/).filter(s => s.length);
+    const weights = tokens.map(tok => /^\s+$/.test(tok) ? 0.15 : syllables(tok) + (/[,.;:!?…]$/.test(tok) ? 0.6 : 0));
+    const total = weights.reduce((a, b) => a + b, 0) || 1;
+    const usable = (end - start) * 0.92;   // leave a breath before the next line
+    lineEl.textContent = '';
+    lineEl.classList.add('words');
+    let cursor = start;
+    tokens.forEach((tok, i) => {
+      const span = document.createElement('span');
+      span.className = 'w';
+      span.textContent = tok;
+      lineEl.appendChild(span);
+      const slot = usable * weights[i] / total;
+      if (!/^\s+$/.test(tok)) words.push({ el: span, start: cursor, end: cursor + slot });
+      cursor += slot;
+    });
+  }
+  // Comet trail: the word being sung is the head; the three words just before it form
+  // the tail, each dimmer than the last, streaked leftward, and gone within a second.
+  const TRAIL = 0.9;          // seconds before a sung word is fully cold
+  const TAIL_WORDS = 3;       // how many words behind the head carry the tail
+  function cometStyle(e) {    // e: 1 = head-bright, 0 = cold
+    const white = 0.42 + 0.58 * e;
+    const shadow = [
+      `0 0 ${(2 + 6 * e).toFixed(1)}px rgba(255,255,255,${(0.8 * e).toFixed(2)})`,
+      `0 0 ${(8 + 14 * e).toFixed(1)}px rgba(128,229,255,${(0.75 * e + 0.05).toFixed(2)})`,
+      `${(-0.35 * e).toFixed(2)}em 0 ${(6 + 10 * e).toFixed(1)}px rgba(0,212,255,${(0.6 * e).toFixed(2)})`,
+      `${(-0.8 * e).toFixed(2)}em 0 ${(10 + 16 * e).toFixed(1)}px rgba(0,212,255,${(0.35 * e).toFixed(2)})`,
+      `${(-1.4 * e).toFixed(2)}em 0 ${(16 + 20 * e).toFixed(1)}px rgba(33,150,243,${(0.2 * e).toFixed(2)})`,
+    ].join(', ');
+    return { color: `rgba(255,255,255,${white.toFixed(2)})`, shadow };
+  }
+  const COLD = cometStyle(0);
+  function updateWords(pos) {
+    let head = -1;
+    for (let i = 0; i < words.length; i++) if (pos >= words[i].start) head = i;
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      const state = pos >= w.end ? 'sung' : pos >= w.start ? 'singing' : '';
+      if (w.el.dataset.s !== state) {
+        w.el.dataset.s = state;
+        w.el.classList.toggle('singing', state === 'singing');
+        w.el.classList.toggle('sung', state === 'sung');
+        if (state !== 'sung') { w.el.style.color = ''; w.el.style.textShadow = ''; }
+      }
+      if (state !== 'sung') continue;
+      const back = head - i;                              // 1 = word just before the head
+      const age = pos - w.end;
+      let e = 0;
+      if (back >= 0 && back <= TAIL_WORDS && age < TRAIL) {
+        const byOrder = 1 - back / (TAIL_WORDS + 1);      // tapers with distance from the head
+        const byTime = 1 - age / TRAIL;                   // and dies within TRAIL seconds
+        e = Math.max(0, byOrder * byTime);
+      }
+      const style = e > 0.01 ? cometStyle(e) : COLD;
+      if (w.el.style.textShadow !== style.shadow) { w.el.style.color = style.color; w.el.style.textShadow = style.shadow; }
+    }
+  }
+
+  function tick() {
+    if (track && (track.status === 'playing' || track.status === 'paused')) {
+      const pos = Math.min(track.duration || 0, Math.max(0, position() - settings.offset / 1000));
+      el.fill.style.width = track.duration ? (pos / track.duration * 100) + '%' : '0%';
+      el.tcur.textContent = fmt(pos);
+      render(false);
+      if (words.length) updateWords(position());
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // controls
+  const cast = document.getElementById('cast');
+  let cursorTimer;
+  function reserveControls() {
+    const open = !controls.classList.contains('hidden');
+    body.classList.toggle('controls-open', open);
+    document.documentElement.style.setProperty('--controls-h', open ? controls.offsetHeight + 'px' : '0px');
+    renderedKey = ''; render(true);
+  }
+  let userHid = settings.hideControls;   // Hide pressed: stay hidden until asked back
+  let edgeTimer = null;
+  const reveal = document.getElementById('reveal');
+  function setControls(open) {
+    controls.classList.toggle('hidden', !open);
+    reveal.hidden = open;
+    reserveControls();
+  }
+  function showControls() {
+    body.classList.add('show-cursor');
+    clearTimeout(cursorTimer);
+    cursorTimer = setTimeout(() => body.classList.remove('show-cursor'), 4000);
+    if (userHid) return;                 // mouse movement alone never un-hides
+    if (controls.classList.contains('hidden')) setControls(true);
+  }
+  function hideControls() {
+    userHid = true;
+    body.classList.remove('show-cursor');
+    setControls(false);
+  }
+  function revealControls() {
+    userHid = false;
+    setControls(true);
+    showControls();
+  }
+  // Resting the mouse along the bottom edge for half a second brings the bar back.
+  window.addEventListener('mousemove', e => {
+    const nearBottom = e.clientY > window.innerHeight - 48;
+    if (userHid && nearBottom && !edgeTimer) {
+      edgeTimer = setTimeout(() => { edgeTimer = null; revealControls(); }, 500);
+    } else if (!nearBottom && edgeTimer) {
+      clearTimeout(edgeTimer); edgeTimer = null;
+    }
+  });
+  reveal.addEventListener('click', revealControls);
+  function toggleFullscreen() {
+    if (bridge) { toApp({ cmd: 'fill' }); return; }
+    if (document.fullscreenElement) document.exitFullscreen?.();
+    else document.documentElement.requestFullscreen?.();
+  }
+  async function showCast() {
+    const box = document.getElementById('castUrls');
+    box.textContent = 'looking up address…';
+    cast.classList.add('open');
+    try {
+      const info = await (await fetch('/info')).json();
+      box.replaceChildren(...info.urls.map(u => { const d = document.createElement('div'); d.className = 'url'; d.textContent = u; return d; }));
+    } catch { box.textContent = location.origin + '/'; }
+  }
+  function persist() {
+    save('scale', settings.scale); save('offset', settings.offset); save('lines', settings.lines);
+    applyLayout(); renderedKey = ''; render(true);
+  }
+  function run(cmd) {
+    switch (cmd) {
+      case 'bigger': settings.scale = Math.min(3, +(settings.scale + 0.1).toFixed(2)); persist(); break;
+      case 'smaller': settings.scale = Math.max(0.4, +(settings.scale - 0.1).toFixed(2)); persist(); break;
+      case 'lines': settings.lines = settings.lines >= 5 ? 1 : settings.lines + 2; persist(); break;
+      case 'offsetPlus': settings.offset += 100; persist(); el.tag.textContent = `offset ${settings.offset} ms`; break;
+      case 'offsetMinus': settings.offset -= 100; persist(); el.tag.textContent = `offset ${settings.offset} ms`; break;
+      case 'fullscreen': toggleFullscreen(); break;
+      case 'cast': showCast(); break;
+      case 'fx': settings.fx = !settings.fx; save('fx', settings.fx); applyLayout(); break;
+      case 'hide': userHid ? revealControls() : hideControls(); break;
+      default: toApp({ cmd }); // nextScreen, allScreens, pin, glass, close
+    }
+  }
+  controls.addEventListener('click', e => {
+    const button = e.target.closest('button[data-cmd]');
+    if (button) run(button.dataset.cmd);
+  });
+  document.getElementById('castClose').addEventListener('click', () => cast.classList.remove('open'));
+  window.addEventListener('mousemove', showControls);
+  window.addEventListener('dblclick', e => { if (!e.target.closest('#controls, #cast')) toggleFullscreen(); });
+  window.addEventListener('keydown', e => {
+    const keys = { '+': 'bigger', '=': 'bigger', '-': 'smaller', '_': 'smaller', ']': 'offsetPlus', '[': 'offsetMinus',
+      'l': 'lines', 'f': 'fullscreen', 'h': 'hide', 'c': 'cast' };
+    if (e.key === 'Escape') { cast.classList.remove('open'); if (bridge) toApp({ cmd: 'unfill' }); return; }
+    if (keys[e.key]) run(keys[e.key]);
+  });
+  window.addEventListener('resize', () => { renderedKey = ''; render(true); });
+  document.fonts?.ready.then(() => { renderedKey = ''; render(true); });
+  window.lyricglow = { reveal: revealControls, setState(state) { Object.assign(settings, state); applyLayout(); renderedKey = ''; render(true); },
+    markButtons(flags) { for (const [cmd, on] of Object.entries(flags)) controls.querySelector(`[data-cmd="${cmd}"]`)?.classList.toggle('on', on); } };
+  setControls(!userHid);
+  window.addEventListener('resize', reserveControls);
+
+  connect();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

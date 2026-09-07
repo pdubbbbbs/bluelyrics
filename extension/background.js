@@ -1,4 +1,4 @@
-// Relays now-playing reports from the content script to the LyricGlow server.
+// Relays now-playing reports from the content script to the BlueLyrics server.
 // Runs in the extension origin so the https page never talks to http itself.
 const SERVER = 'http://127.0.0.1:7331/report';
 

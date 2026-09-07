@@ -1,4 +1,4 @@
-// Reads the playing video on YouTube / YouTube Music and reports it to LyricGlow.
+// Reads the playing video on YouTube / YouTube Music and reports it to BlueLyrics.
 // Title/artist come from the Media Session metadata the site itself publishes;
 // position and duration come straight from the <video> element.
 (() => {

@@ -6,7 +6,7 @@
       const kit = window.MusicKit && window.MusicKit.getInstance && window.MusicKit.getInstance();
       if (!kit || !kit.musicUserToken) return false;
       window.postMessage({
-        type: 'lyricglow-apple-tokens',
+        type: 'bluelyrics-apple-tokens',
         developerToken: kit.developerToken || '',
         musicUserToken: kit.musicUserToken,
         storefront: kit.storefrontId || (kit.api && kit.api.storefrontId) || 'us',

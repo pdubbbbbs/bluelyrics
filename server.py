@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LyricGlow server: streams the Music.app now-playing state and lyrics.
+"""BlueLyrics server: streams the Music.app now-playing state and lyrics.
 
 Polls Music.app through AppleScript, resolves lyrics (embedded first, then
 LRCLIB synced/plain), caches them on disk, and serves a glowing lyrics page
@@ -32,13 +32,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 STATIC = ROOT / "static"
-CACHE = Path(os.environ.get("LYRICGLOW_CACHE", ROOT / "cache"))
+CACHE = Path(os.environ.get("BLUELYRICS_CACHE", ROOT / "cache"))
 ART_PATH = CACHE / "current-art.bin"
 LRCLIB = "https://lrclib.net/api"
-USER_AGENT = "LyricGlow/0.1 (github.com/pdubbbbbs)"
+USER_AGENT = "BlueLyrics/0.1 (github.com/pdubbbbbs)"
 POLL_SECONDS = 0.3
 
-log = logging.getLogger("lyricglow")
+log = logging.getLogger("bluelyrics")
 
 POLL_SCRIPT = """
 if application "Music" is not running then return "off"
@@ -551,7 +551,7 @@ class Monitor(threading.Thread):
       self.state.status = "playing"
       self.state.pid = "demo"
       self.state.title = demo.get("title", "Demo track")
-      self.state.artist = demo.get("artist", "LyricGlow demo")
+      self.state.artist = demo.get("artist", "BlueLyrics demo")
       self.state.duration = demo["duration"]
       self.state.position = position
       self.state.lyrics_source = "demo"
@@ -866,7 +866,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-  parser = argparse.ArgumentParser(description="LyricGlow now-playing lyrics server")
+  parser = argparse.ArgumentParser(description="BlueLyrics now-playing lyrics server")
   parser.add_argument("--host", default="0.0.0.0", help="bind address (default all interfaces)")
   parser.add_argument("--port", type=int, default=7331)
   parser.add_argument("--verbose", action="store_true")
@@ -883,13 +883,13 @@ def main() -> None:
     last = max((line["t"] or 0) for line in cached["lines"]) if cached["lines"] else 60
     monitor.demo = {"lines": cached["lines"], "synced": cached["synced"],
                     "duration": float(last + 8), "started": time.time(),
-                    "title": cached.get("title", "Demo track"), "artist": cached.get("artist", "LyricGlow demo")}
+                    "title": cached.get("title", "Demo track"), "artist": cached.get("artist", "BlueLyrics demo")}
     log.info("demo mode: replaying %s", args.demo)
   monitor.start()
   Handler.monitor = monitor
   server = ThreadingHTTPServer((args.host, args.port), Handler)
   server.daemon_threads = True
-  log.info("LyricGlow listening on http://%s:%d", args.host, args.port)
+  log.info("BlueLyrics listening on http://%s:%d", args.host, args.port)
   try:
     server.serve_forever()
   except KeyboardInterrupt:
