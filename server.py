@@ -747,6 +747,14 @@ class Handler(BaseHTTPRequestHandler):
       self._send(200, (STATIC / "index.html").read_bytes(), "text/html; charset=utf-8")
     elif path == "/fonts.html":
       self._send(200, (STATIC / "fonts.html").read_bytes(), "text/html; charset=utf-8")
+    elif path == "/icon.html":
+      self._send(200, (STATIC / "icon.html").read_bytes(), "text/html; charset=utf-8")
+    elif path.startswith("/icons/"):
+      icon = STATIC / "icons" / Path(urllib.parse.unquote(path)).name
+      if icon.is_file() and icon.suffix == ".png":
+        self._send(200, icon.read_bytes(), "image/png")
+      else:
+        self._send(404, b"not found", "text/plain")
     elif path == "/prefs":
       self._send(200, json.dumps({"prefs": load_prefs(), "fonts": FONTS}).encode(), "application/json")
     elif path == "/health":

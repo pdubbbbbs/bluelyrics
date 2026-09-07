@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BlueLyrics icon</title>
+<style>
+  :root { --bg-0:#040d1a; --bg-1:#0a1628; --cyan-bright:#80e5ff; --border:rgba(77,201,246,.35); --text:#e6f4ff; --muted:rgba(230,244,255,.6); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background: radial-gradient(120% 80% at 50% 0%, var(--bg-1), var(--bg-0) 70%); color:var(--text); font-family: Inter,-apple-system,sans-serif; min-height:100vh; padding: 4vmin; }
+  h1 { font-size: 3vmin; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom: 3vmin; }
+  .row { display:flex; gap: 4vmin; flex-wrap: wrap; justify-content:center; align-items:flex-start; }
+  figure { text-align:center; }
+  figure img { width: min(44vw, 70vh); height:auto; border-radius: 22%; box-shadow: 0 0 60px rgba(0,212,255,.25); }
+  figcaption { margin-top: 1.5vmin; font-size: 2.6vmin; font-weight: 600; }
+  figcaption small { display:block; color: var(--muted); font-weight: 400; font-size: 2vmin; margin-top:.4em; }
+  .actions { display:flex; gap: 2vmin; justify-content:center; margin-top: 4vmin; flex-wrap:wrap; }
+  button { font: 600 max(18px, 2.4vmin) Inter, sans-serif; color: var(--text); background: rgba(33,150,243,.14); border: 1px solid rgba(77,201,246,.45); border-radius: 14px; padding: .9em 1.8em; min-height: 56px; cursor: pointer; }
+  button:hover, button:focus-visible { background: rgba(0,212,255,.28); border-color: var(--cyan-bright); box-shadow: 0 0 14px rgba(0,212,255,.55); outline:none; }
+  button.no { border-color: rgba(235,77,77,.6); }
+  #status { text-align:center; margin-top: 3vmin; font-size: 2.4vmin; color: var(--cyan-bright); min-height: 1.5em; }
+  .small { display:flex; gap: 2vmin; justify-content:center; margin-top: 3vmin; align-items:center; }
+  .small img { border-radius: 22%; }
+</style></head>
+<body>
+  <h1>BlueLyrics app icon</h1>
+  <div class="row">
+    <figure><img src="/icons/bluelyrics-1024.png" alt="Proposed BlueLyrics icon: the BlueGuard glass shield with a glowing blue music note"><figcaption>Proposed BlueLyrics<small>BlueGuard shield, Bluetooth rune replaced by a glowing note</small></figcaption></figure>
+    <figure><img src="/icons/blueguard-1024.png" alt="Current BlueGuard icon: glass shield with Bluetooth rune"><figcaption>BlueGuard, for reference<small>the master icon it is built from</small></figcaption></figure>
+  </div>
+  <div class="small">
+    <img src="/icons/bluelyrics-1024.png" width="128" height="128" alt=""><img src="/icons/bluelyrics-1024.png" width="64" height="64" alt=""><img src="/icons/bluelyrics-1024.png" width="32" height="32" alt="">
+    <span style="color:var(--muted)">Dock, Finder and menu sizes</span>
+  </div>
+  <div class="actions">
+    <button id="yes">Approve this icon</button>
+    <button id="no" class="no">Not this one</button>
+  </div>
+  <div id="status"></div>
+<script>
+  const say = (verdict) => fetch('/log', { method: 'POST', body: JSON.stringify({ icon: verdict }) })
+    .then(() => { document.getElementById('status').textContent = verdict === 'approved' ? 'Approved. Claude has been told.' : 'Noted as not approved. Claude has been told.'; })
+    .catch(() => { document.getElementById('status').textContent = 'Could not reach the app.'; });
+  document.getElementById('yes').addEventListener('click', () => say('approved'));
+  document.getElementById('no').addEventListener('click', () => say('rejected'));
+</script>
+</body></html>

@@ -68,7 +68,8 @@ bundle() {
   cp "${HERE}/Info-bundle.plist" "${app}.building/Contents/Info.plist"
   cp "${HERE}/assets/AppIcon.icns" "${app}.building/Contents/Resources/AppIcon.icns"
   cp "${HERE}/server.py" "${app}.building/Contents/Resources/server.py"
-  cp "${HERE}/static/index.html" "${HERE}/static/fonts.html" "${app}.building/Contents/Resources/static/"
+  cp "${HERE}/static/index.html" "${HERE}/static/fonts.html" "${HERE}/static/icon.html" "${app}.building/Contents/Resources/static/"
+  cp -R "${HERE}/static/icons" "${app}.building/Contents/Resources/static/icons"
   cp -R "${HERE}/static/fonts" "${app}.building/Contents/Resources/static/fonts"
   codesign --force --sign - "${app}.building" >/dev/null 2>&1 || true
   if [[ -d "${app}" ]]; then mv "${app}" "${app}.previous-$(date +%Y%m%d-%H%M%S)"; fi
