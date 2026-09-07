@@ -31,9 +31,10 @@ struct Options {
 }
 
 /// Floating panel that still accepts keyboard focus when clicked.
-final class GlowPanel: NSPanel {
+/// A normal window that participates in Mission Control and Cmd-Tab like any app window.
+final class GlowPanel: NSWindow {
   override var canBecomeKey: Bool { true }
-  override var canBecomeMain: Bool { false }
+  override var canBecomeMain: Bool { true }
 }
 
 /// Web view that lets a drag anywhere on the page move the window.
@@ -54,7 +55,7 @@ final class LyricWindow: NSObject, WKScriptMessageHandler, NSWindowDelegate {
   weak var app: BlueLyricsApp?
   var screenIndex: Int
   var fill = false
-  var pinned = true
+  var pinned = false
   var glass = false
   var floatingFrame: NSRect
 
@@ -66,7 +67,7 @@ final class LyricWindow: NSObject, WKScriptMessageHandler, NSWindowDelegate {
     floatingFrame = LyricWindow.floatingRect(on: screen)
     panel = GlowPanel(
       contentRect: fill ? screen.visibleFrame : floatingFrame,
-      styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView, .nonactivatingPanel],
+      styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
       backing: .buffered, defer: false)
     let content = WKUserContentController()
     let configuration = WKWebViewConfiguration()
@@ -91,7 +92,7 @@ final class LyricWindow: NSObject, WKScriptMessageHandler, NSWindowDelegate {
     panel.isMovableByWindowBackground = true
     panel.hidesOnDeactivate = false
     panel.isReleasedWhenClosed = false
-    panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+    applyBehavior()
     panel.minSize = NSSize(width: 480, height: 280)
     panel.backgroundColor = NSColor(red: 0.016, green: 0.05, blue: 0.1, alpha: 1)
     panel.delegate = self
@@ -102,7 +103,7 @@ final class LyricWindow: NSObject, WKScriptMessageHandler, NSWindowDelegate {
     strip.frame = NSRect(x: 0, y: panel.contentView!.bounds.height - 30, width: panel.contentView!.bounds.width, height: 30)
     strip.autoresizingMask = [.width, .minYMargin]
     panel.contentView?.addSubview(strip)
-    panel.orderFrontRegardless()
+    panel.makeKeyAndOrderFront(nil)
   }
 
   func load() {
@@ -111,7 +112,16 @@ final class LyricWindow: NSObject, WKScriptMessageHandler, NSWindowDelegate {
     webView.load(URLRequest(url: URL(string: (app?.options.url ?? "") + "/?" + query.joined(separator: "&"))!))
   }
 
-  func applyLevel() { panel.level = pinned ? .floating : .normal }
+  func applyLevel() {
+    panel.level = pinned ? .floating : .normal
+    applyBehavior()
+    panel.orderFront(nil)
+  }
+
+  /// Pinned: follow you to every Space and sit over full-screen apps. Unpinned: behave like any window.
+  func applyBehavior() {
+    panel.collectionBehavior = pinned ? [.canJoinAllSpaces, .fullScreenAuxiliary] : [.managed, .participatesInCycle]
+  }
 
   func applyGlass() {
     panel.isOpaque = !glass
