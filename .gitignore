@@ -1,0 +1,15 @@
+# build products and local state
+LyricGlow
+LyricGlow.app/
+LyricGlow.app.previous-*/
+*.building/
+cache/
+__pycache__/
+*.pyc
+.DS_Store
+# dated working copies kept locally, not in history
+static/index.v*.html
+server.v*.py
+LyricGlow.v*.swift
+# release zips
+dist/

@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "LyricGlow Reporter",
+  "version": "0.2",
+  "description": "Sends what YouTube / YouTube Music is playing to the local LyricGlow lyrics window.",
+  "permissions": [],
+  "host_permissions": ["http://127.0.0.1:7331/*", "http://localhost:7331/*"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    {
+      "matches": ["https://music.youtube.com/*", "https://www.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://music.apple.com/*"],
+      "js": ["apple-content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    { "resources": ["apple-page.js"], "matches": ["https://music.apple.com/*"] }
+  ]
+}
