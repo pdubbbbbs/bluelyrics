@@ -25,8 +25,6 @@ targets:
         buildPhase: resources
         type: folder
       - path: Assets.xcassets
-    info:
-      path: Info.plist
     entitlements:
       path: BlueLyrics.entitlements
     settings:
@@ -34,6 +32,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.blueguard.bluelyrics
         PRODUCT_NAME: BlueLyrics
         INFOPLIST_FILE: Info.plist
+        GENERATE_INFOPLIST_FILE: NO
         CODE_SIGN_ENTITLEMENTS: BlueLyrics.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         SWIFT_STRICT_CONCURRENCY: minimal

@@ -18,3 +18,4 @@ app/.build/
 app/build/
 app/*.xcodeproj/xcuserdata/
 app/*.xcodeproj/project.xcworkspace/xcuserdata/
+app/dist/
