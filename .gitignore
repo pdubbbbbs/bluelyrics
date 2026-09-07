@@ -21,3 +21,6 @@ app/*.xcodeproj/project.xcworkspace/xcuserdata/
 app/dist/
 app/build-nosandbox/
 app/backups/
+# local-only: source icon and a loose copy of the extension
+icon/
+extension.copy-*/
