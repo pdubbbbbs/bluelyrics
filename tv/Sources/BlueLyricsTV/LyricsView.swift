@@ -31,9 +31,9 @@ struct LyricsView: View {
             }
             .padding(.horizontal, showMusicPanel ? 60 : 90)
             .padding(.vertical, 60)
-            .frame(width: showMusicPanel ? geo.size.width * 0.75 : geo.size.width)
+            .frame(width: showMusicPanel ? geo.size.width * 0.75 : geo.size.width, height: geo.size.height)
             if showMusicPanel {
-              MusicPanel().frame(width: geo.size.width * 0.25)
+              MusicPanel().frame(width: geo.size.width * 0.25, height: geo.size.height)
             }
           }
         }

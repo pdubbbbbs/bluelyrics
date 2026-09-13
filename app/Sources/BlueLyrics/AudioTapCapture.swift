@@ -101,12 +101,15 @@ final class AudioTapCapture {
   private var rawLogAt = 0.0
   private var lastSoundAt = 0.0
   private var firstCallbackAt = 0.0
-  /// True when audio callbacks arrive but every sample is zero: macOS is withholding the audio (permission).
+  /// True when audio callbacks arrive but no sample has ever been non-zero: macOS is withholding
+  /// the audio (permission). Once real sound has come through, silence just means nothing is playing.
   var silentDespiteAudio: Bool {
     guard running, firstCallbackAt > 0 else { return false }
     let now = Date().timeIntervalSince1970
-    return now - firstCallbackAt > 8 && now - lastSoundAt > 8
+    return now - firstCallbackAt > 8 && lastSoundAt == 0
   }
+  /// Seconds since the tap last heard anything above silence, or nil before the first sound.
+  var secondsSinceSound: Double? { lastSoundAt > 0 ? Date().timeIntervalSince1970 - lastSoundAt : nil }
   private func handle(_ list: UnsafePointer<AudioBufferList>, at time: UnsafePointer<AudioTimeStamp>) {
     rawCalls += 1
     let abl = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: list))

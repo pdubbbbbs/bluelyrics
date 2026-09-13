@@ -298,6 +298,12 @@
     user-select: all; -webkit-user-select: all;
   }
   #cast p { color: var(--muted); font-size: 2.4vmin; max-width: 60ch; margin: 2vmin auto 0; line-height: 1.5; }
+  #cast p.tv { color: var(--text); font-size: 2.8vmin; max-width: 56ch; margin-top: 0; }
+  #cast p.tv strong { color: var(--cyan-bright); font-weight: 600; }
+  #cast .tvstate { display: inline-block; margin: 2vmin auto 0; padding: 1.2vmin 2.4vmin; border-radius: 999px; font: 600 2.4vmin Inter, sans-serif;
+    color: var(--muted); border: 1px solid var(--border); }
+  #cast .tvstate.on { color: #fff; background: rgba(var(--glow-2), .25); border-color: var(--cyan-bright); box-shadow: 0 0 14px rgba(var(--glow-2), .6); }
+  #cast h2.other { margin-top: 5vmin; font-size: 3vmin; color: var(--muted); }
   #cast button { margin-top: 3vmin; }
 
   /* calm mode (default): no continuous animation, no live backdrop blur */
@@ -354,11 +360,14 @@
     <p>System Settings → Privacy &amp; Security → Screen &amp; System Audio Recording → under "System Audio Recording Only" press the plus button and choose BlueLyrics.</p>
     <button id="openPermission">Open that setting</button>
   </div>
-  <div id="cast" role="dialog" aria-label="Cast address">
+  <div id="cast" role="dialog" aria-label="Cast to Apple TV">
     <div>
-      <h2>Open this on any screen</h2>
+      <h2>Cast to Apple TV</h2>
+      <p class="tv">On your Apple TV, open <strong>BlueLyrics</strong> and choose <strong>Follow a Mac</strong>. It finds this Mac by itself, listed as <strong id="castName">this Mac</strong>.</p>
+      <div id="castTV" class="tvstate">Checking for Apple TVs…</div>
+      <h2 class="other">Any other screen</h2>
       <div id="castUrls"></div>
-      <p>Any browser on your network: a TV browser, a phone, a tablet, or a Brave tab you cast to a Chromecast or AirPlay target. Double-click the page there to go full screen.</p>
+      <p>Type that address into a browser on a phone, tablet, or smart TV, or into a Brave tab you cast to a Chromecast or AirPlay target. Double-click the page there to go full screen.</p>
       <button id="castClose">Back to lyrics</button>
     </div>
   </div>
@@ -732,14 +741,25 @@
     if (document.fullscreenElement) document.exitFullscreen?.();
     else document.documentElement.requestFullscreen?.();
   }
-  async function showCast() {
+  let castPoll = null;
+  async function refreshCast() {
     const box = document.getElementById('castUrls');
-    box.textContent = 'looking up address…';
-    cast.classList.add('open');
+    const tv = document.getElementById('castTV');
     try {
       const info = await (await fetch('/info')).json();
+      document.getElementById('castName').textContent = info.name || 'this Mac';
       box.replaceChildren(...info.urls.map(u => { const d = document.createElement('div'); d.className = 'url'; d.textContent = u; return d; }));
-    } catch { box.textContent = location.origin + '/'; }
+      const tvs = (info.appletv || []).map(n => n || 'Apple TV');
+      tv.textContent = tvs.length ? 'Connected: ' + tvs.join(', ') : 'No Apple TV connected yet';
+      tv.classList.toggle('on', tvs.length > 0);
+    } catch { box.textContent = location.origin + '/'; tv.textContent = ''; }
+  }
+  function showCast() {
+    document.getElementById('castUrls').textContent = 'looking up address…';
+    cast.classList.add('open');
+    refreshCast();
+    clearInterval(castPoll);
+    castPoll = setInterval(() => { if (cast.classList.contains('open')) refreshCast(); else clearInterval(castPoll); }, 2000);
   }
   function persist() {
     save('scale', settings.scale); save('offset', settings.offset); save('lines', settings.lines);
@@ -778,7 +798,7 @@
   });
   window.addEventListener('resize', () => { renderedKey = ''; render(true); });
   document.fonts?.ready.then(() => { renderedKey = ''; render(true); });
-  window.bluelyrics = { reveal: revealControls, setState(state) { Object.assign(settings, state); applyLayout(); renderedKey = ''; render(true); },
+  window.bluelyrics = { reveal: revealControls, showCast, setState(state) { Object.assign(settings, state); applyLayout(); renderedKey = ''; render(true); },
     markButtons(flags) { for (const [cmd, on] of Object.entries(flags)) controls.querySelector(`[data-cmd="${cmd}"]`)?.classList.toggle('on', on); } };
   setControls(!userHid);
   window.addEventListener('resize', reserveControls);

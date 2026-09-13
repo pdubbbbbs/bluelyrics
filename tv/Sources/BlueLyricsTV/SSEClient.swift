@@ -2,6 +2,7 @@
 // Mac's /events stream and hands each one to a callback. Reconnects on its own.
 
 import Foundation
+import UIKit
 
 final class SSEClient {
   typealias Handler = (String, [String: Any]) -> Void
@@ -26,6 +27,8 @@ final class SSEClient {
           var request = URLRequest(url: url)
           request.timeoutInterval = 60 * 60 * 24
           request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
+          request.setValue("appletv", forHTTPHeaderField: "X-BlueLyrics-Client")
+          request.setValue(await MainActor.run { UIDevice.current.name }, forHTTPHeaderField: "X-BlueLyrics-Name")
           let (bytes, response) = try await URLSession.shared.bytes(for: request)
           guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
           await MainActor.run { onState(true) }

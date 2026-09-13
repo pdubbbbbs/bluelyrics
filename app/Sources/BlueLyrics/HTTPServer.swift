@@ -35,6 +35,8 @@ struct HTTPResponse {
 final class SSEClient {
   let connection: NWConnection
   private(set) var alive = true
+  var kind = "browser"     // browser | appletv, from the X-BlueLyrics-Client header
+  var name = ""            // the client's own device name, if it sends one
   init(connection: NWConnection) { self.connection = connection }
   func send(event: String, data: Any) {
     guard alive, let json = try? JSONSerialization.data(withJSONObject: data) else { return }

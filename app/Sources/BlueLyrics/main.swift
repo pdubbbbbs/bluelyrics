@@ -200,7 +200,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     server.route("GET", "/icon.html") { [weak self] _ in self?.page("icon.html") ?? .notFound }
     server.route("GET", "/health") { _ in .text("ok") }
     server.route("GET", "/state") { [weak self] _ in .json(self?.nowPlaying.snapshot().json ?? [:]) }
-    server.route("GET", "/info") { _ in .json(["urls": LAN.urls(port: SERVER_PORT), "apple": false]) }
+    server.route("GET", "/info") { [weak self] _ in
+      var clients: [[String: String]] = []
+      if let self {
+        self.sseLock.lock(); self.sseClients.removeAll { !$0.alive }; clients = self.sseClients.map { ["kind": $0.kind, "name": $0.name] }; self.sseLock.unlock()
+      }
+      return .json(["urls": LAN.urls(port: SERVER_PORT), "apple": false,
+                    "name": Host.current().localizedName ?? "this Mac",
+                    "clients": clients,
+                    "appletv": clients.filter { $0["kind"] == "appletv" }.map { $0["name"] ?? "" }])
+    }
     server.route("GET", "/prefs") { _ in .json(["prefs": Prefs.load(), "fonts": Prefs.fonts]) }
     server.route("GET", "/art") { [weak self] _ in
       guard self?.nowPlaying.snapshot().hasArt == true, let data = try? Data(contentsOf: Paths.art) else { return .notFound }
@@ -262,8 +271,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     server.route("POST", "/log") { request in
       Log.info("page: " + (String(data: request.body.prefix(8000), encoding: .utf8) ?? "")); return .text("ok")
     }
-    server.sse("/events") { [weak self] _, client in
+    server.sse("/events") { [weak self] request, client in
       guard let self else { return }
+      if let kind = request.headers["x-bluelyrics-client"], !kind.isEmpty { client.kind = kind }
+      client.name = request.headers["x-bluelyrics-name"] ?? ""
+      if client.kind == "appletv" { Log.info("Apple TV connected: \(client.name)") }
       self.sseLock.lock(); self.sseClients.append(client); self.sseLock.unlock()
       client.send(event: "prefs", data: ["prefs": Prefs.load(), "fonts": Prefs.fonts])
       client.send(event: "track", data: self.nowPlaying.snapshot().json)
@@ -307,6 +319,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     appMenu.addItem(withTitle: "Show on every display", action: #selector(showAll), keyEquivalent: "a").target = self
     appMenu.addItem(withTitle: "Close all windows", action: #selector(closeAll), keyEquivalent: "w").target = self
     appMenu.addItem(.separator())
+    appMenu.addItem(withTitle: "Cast to Apple TV…", action: #selector(castPanel), keyEquivalent: "t").target = self
+    appMenu.addItem(.separator())
     appMenu.addItem(withTitle: "Quit BlueLyrics", action: #selector(quit), keyEquivalent: "q").target = self
     appItem.submenu = appMenu; NSApp.mainMenu = main
   }
@@ -332,10 +346,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     menu.addItem(withTitle: "Show controls", action: #selector(showControls), keyEquivalent: "h").target = self
     menu.addItem(withTitle: "Close all windows", action: #selector(closeAll), keyEquivalent: "w").target = self
     menu.addItem(.separator())
-    menu.addItem(withTitle: "Open in browser (for casting)", action: #selector(openBrowser), keyEquivalent: "b").target = self
-    let tv = NSMenuItem(title: "Apple TV: open BlueLyrics on the TV, it finds “\(Host.current().localizedName ?? "this Mac")”", action: nil, keyEquivalent: "")
-    tv.isEnabled = false
-    menu.addItem(tv)
+    menu.addItem(withTitle: "Cast to Apple TV…", action: #selector(castPanel), keyEquivalent: "t").target = self
+    menu.addItem(withTitle: "Open in a browser", action: #selector(openBrowser), keyEquivalent: "b").target = self
     menu.addItem(withTitle: "Reload", action: #selector(reload), keyEquivalent: "r").target = self
     menu.addItem(.separator())
     menu.addItem(withTitle: "Quit BlueLyrics", action: #selector(quit), keyEquivalent: "q").target = self
@@ -346,6 +358,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
   }
   @objc func showAll() { showOnAllScreens() }
   @objc func showControls() { windows.forEach { $0.webView.evaluateJavaScript("window.bluelyrics && window.bluelyrics.reveal()") } }
+  /// Show the Cast panel, which explains the Apple TV app and lists this Mac's addresses.
+  @objc func castPanel() {
+    if windows.isEmpty { open(on: mainScreenIndex()) }
+    let js = "window.bluelyrics && window.bluelyrics.showCast()"
+    DispatchQueue.main.asyncAfter(deadline: .now() + (windows.isEmpty ? 1.5 : 0)) { [weak self] in
+      self?.windows.forEach { $0.webView.evaluateJavaScript(js); $0.panel.orderFrontRegardless() }
+    }
+  }
   @objc func closeAll() { windows.forEach { $0.panel.close() } }
   @objc func openBrowser() { NSWorkspace.shared.open(URL(string: "http://127.0.0.1:\(SERVER_PORT)/")!) }
   @objc func reload() { windows.forEach { $0.webView.reload() } }
