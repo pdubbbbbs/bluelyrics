@@ -6,6 +6,7 @@ import MusicKit
 struct MusicPanel: View {
   @EnvironmentObject var music: MusicPlayerStore
   @EnvironmentObject var store: LyricsStore
+  @Namespace private var panelNamespace
 
   var body: some View {
     VStack(alignment: .leading, spacing: 24) {
@@ -53,9 +54,11 @@ struct MusicPanel: View {
       HStack(spacing: 18) {
         Button { music.previous() } label: { Image(systemName: "backward.fill") }
         Button { music.togglePlayPause() } label: { Image(systemName: music.isPlaying ? "pause.fill" : "play.fill") }
+          .prefersDefaultFocus(in: panelNamespace)
         Button { music.next() } label: { Image(systemName: "forward.fill") }
       }
       .font(.system(size: 26))
+      .focusScope(panelNamespace)
     }
   }
 

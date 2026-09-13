@@ -5,6 +5,7 @@ import SwiftUI
 
 struct LyricsView: View {
   @EnvironmentObject var store: LyricsStore
+  @EnvironmentObject var music: MusicPlayerStore
   let onDisconnect: () -> Void
   var showMusicPanel = false
   @State private var lastIndex = -1
@@ -47,11 +48,14 @@ struct LyricsView: View {
       }
     }
     .ignoresSafeArea()
-    .focusable()
+    // In Mac mode nothing on screen takes focus, so the stage itself does, which lets Menu work.
+    // In Apple TV mode the music pane's buttons own focus; making the whole screen focusable
+    // would light every control at once when Select is pressed.
+    .focusable(!showMusicPanel)
     .focused($focused)
-    .onAppear { focused = true }
+    .onAppear { if !showMusicPanel { focused = true } }
     .onExitCommand { onDisconnect() }
-    .onPlayPauseCommand { }
+    .onPlayPauseCommand { if showMusicPanel { music.togglePlayPause() } }
   }
 
   private var theme: Theme { store.theme }
