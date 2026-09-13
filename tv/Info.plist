@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
+  <key>CFBundleDisplayName</key><string>BlueLyrics</string>
+  <key>CFBundleExecutable</key><string>$(EXECUTABLE_NAME)</string>
+  <key>CFBundleIdentifier</key><string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+  <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+  <key>CFBundleName</key><string>BlueLyrics</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>$(MARKETING_VERSION)</string>
+  <key>CFBundleVersion</key><string>$(CURRENT_PROJECT_VERSION)</string>
+  <key>LSRequiresIPhoneOS</key><true/>
+  <key>UIUserInterfaceStyle</key><string>Dark</string>
+  <key>UIRequiredDeviceCapabilities</key><array><string>arm64</string></array>
+  <key>NSLocalNetworkUsageDescription</key>
+  <string>BlueLyrics finds the Mac running BlueLyrics on your network and follows its word-synced lyrics.</string>
+  <key>NSAppleMusicUsageDescription</key>
+  <string>BlueLyrics plays your Apple Music library on this Apple TV and shows the lyrics beside it.</string>
+  <key>NSBonjourServices</key>
+  <array><string>_bluelyrics._tcp</string></array>
+  <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsLocalNetworking</key><true/>
+  </dict>
+</dict>
+</plist>

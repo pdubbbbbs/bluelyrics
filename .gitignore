@@ -24,3 +24,7 @@ app/backups/
 # local-only: source icon and a loose copy of the extension
 icon/
 extension.copy-*/
+# tvOS app build products
+tv/build/
+tv/*.xcodeproj/xcuserdata/
+tv/*.xcodeproj/project.xcworkspace/xcuserdata/
