@@ -7,7 +7,7 @@ BUILD="${1:?build number}"
 VERSION=$(plutil -extract CFBundleShortVersionString raw Info.plist)
 DIST="Apple Distribution: Philip Wright (2PV5B37GLP)"
 INST="3rd Party Mac Developer Installer: Philip Wright (2PV5B37GLP)"
-PROFILE="$HOME/Library/BlueLyrics-signing/BlueLyrics_Mac_App_Store.provisionprofile"
+PROFILE="$HOME/Library/BlueLyrics-signing/BlueLyrics_Mac_App_Store_3.provisionprofile"
 swift build -c release 2>&1 | grep -E "error|Build complete"
 APP="dist/BlueLyrics.app"; rm -rf "$APP"; mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp .build/release/BlueLyrics "$APP/Contents/MacOS/"
