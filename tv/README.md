@@ -8,7 +8,7 @@ looks up lyrics for each song on LRCLIB (`LyricsFetcher.swift`, same lookup orde
 Mac app) and feeds the same lyric stage. tvOS cannot embed or overlay the real Music app, so the pane is
 BlueLyrics' own: artwork, title, previous/play/next, recently played albums and playlists, and the
 tracks of whichever one is opened. Needs an Apple Music subscription on the Apple TV, and the App ID
-`com.blueguard.bluelyrics.tv` must have the MusicKit app service enabled in the developer portal
+the App ID `com.blueguard.bluelyrics` (shared with the Mac app) must have the MusicKit app service enabled in the developer portal
 before playback works on a real device. The simulator has no Apple Music account, so only the layout
 and the permission prompt were verified there.
 

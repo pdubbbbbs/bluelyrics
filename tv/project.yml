@@ -19,16 +19,22 @@ targets:
     platform: tvOS
     sources:
       - path: Sources/BlueLyricsTV
-    resources:
       - path: Assets.xcassets
+        buildPhase: resources
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.blueguard.bluelyrics.tv
+        PRODUCT_BUNDLE_IDENTIFIER: com.blueguard.bluelyrics
         PRODUCT_NAME: BlueLyrics
         INFOPLIST_FILE: Info.plist
         GENERATE_INFOPLIST_FILE: NO
         SWIFT_STRICT_CONCURRENCY: minimal
         TARGETED_DEVICE_FAMILY: "3"
+        ASSETCATALOG_COMPILER_APPICON_NAME: "App Icon & Top Shelf Image"
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "BlueLyrics tvOS App Store 20260912"
     dependencies:
       - sdk: Network.framework
       - sdk: MusicKit.framework

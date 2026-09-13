@@ -47,6 +47,13 @@ final class SSEClient {
       if error != nil { self?.alive = false }
     })
   }
+  /// A comment frame; browsers ignore it, and a dead peer fails the write so `alive` drops.
+  func ping() {
+    guard alive else { return }
+    connection.send(content: Data(": ping\n\n".utf8), completion: .contentProcessed { [weak self] error in
+      if error != nil { self?.alive = false }
+    })
+  }
   func close() { alive = false; connection.cancel() }
 }
 

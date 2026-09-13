@@ -154,6 +154,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     listener.onStatus = { [weak self] status in self?.sendAll(event: "listen", data: ["state": status]) }
     nowPlaying.onChange { [weak self] state, trackChanged in self?.broadcast(state, trackChanged: trackChanged) }
     nowPlaying.start()
+    // Keepalive so clients that vanished (an Apple TV put to sleep) drop out of the Cast panel quickly.
+    Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+      guard let self else { return }
+      self.sseLock.lock(); self.sseClients.removeAll { !$0.alive }; let clients = self.sseClients; self.sseLock.unlock()
+      clients.forEach { $0.ping() }
+    }
     open(on: mainScreenIndex())
     if Prefs.listen {
       DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in

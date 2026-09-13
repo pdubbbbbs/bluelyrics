@@ -17,6 +17,7 @@
 		996E6071D1CCAFA8BB8A6E5D /* MusicPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E8FBBC6F69BA96B7178E15D /* MusicPanel.swift */; };
 		9EC8EF0F88D418DE138292EE /* Network.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4BDD221DD0632A7C3FC263E /* Network.framework */; };
 		B1E67028EAB80C8D93EA9554 /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A01774AA1DE137E6E9B46CB /* Fonts.swift */; };
+		B98DA4ABA54D976AC4E06EF3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A704F765007B951903E6F40B /* Assets.xcassets */; };
 		CF8B5B0A25EA49D61FC29BAE /* LyricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A8766AF60A96C9D8B196754 /* LyricsView.swift */; };
 		D1487555127F2033083E18F2 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5055BC931578380319B9A3A3 /* Theme.swift */; };
 		D5F46ADF52D7038C284725DB /* LyricsFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFF8C8245A4400819542288 /* LyricsFetcher.swift */; };
@@ -34,6 +35,7 @@
 		8820473302FA38DE30F3955E /* Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		911B7DA6694370860C3BDD30 /* MusicPlayerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicPlayerStore.swift; sourceTree = "<group>"; };
 		9A8766AF60A96C9D8B196754 /* LyricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsView.swift; sourceTree = "<group>"; };
+		A704F765007B951903E6F40B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CFFF8C8245A4400819542288 /* LyricsFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsFetcher.swift; sourceTree = "<group>"; };
 		E4BDD221DD0632A7C3FC263E /* Network.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Network.framework; path = System/Library/Frameworks/Network.framework; sourceTree = SDKROOT; };
 		E7729F0BCDC228FF9DFF96E9 /* BlueLyricsTV.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = BlueLyricsTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -73,6 +75,7 @@
 		B833805C1C960B43A5A6DE30 = {
 			isa = PBXGroup;
 			children = (
+				A704F765007B951903E6F40B /* Assets.xcassets */,
 				F86F8C73C29141E9967A60EF /* Sources */,
 				E55C763553E73AE016C187BE /* Frameworks */,
 				B89B5FB5D948CE5C45F03C81 /* Products */,
@@ -112,6 +115,7 @@
 			buildConfigurationList = 8F8781ABBFEDAA4BE45CDA4B /* Build configuration list for PBXNativeTarget "BlueLyricsTV" */;
 			buildPhases = (
 				BE3216B6A8E13C8C16DE927C /* Sources */,
+				CDE6241FDB258C7CBE7589B8 /* Resources */,
 				E02C70ECCFD689947D49C044 /* Frameworks */,
 			);
 			buildRules = (
@@ -136,7 +140,6 @@
 				TargetAttributes = {
 					E14CA92466A9B95F5EED420B = {
 						DevelopmentTeam = 2PV5B37GLP;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -158,6 +161,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CDE6241FDB258C7CBE7589B8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B98DA4ABA54D976AC4E06EF3 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BE3216B6A8E13C8C16DE927C /* Sources */ = {
@@ -186,14 +200,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.blueguard.bluelyrics.tv;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blueguard.bluelyrics;
 				PRODUCT_NAME = BlueLyrics;
+				PROVISIONING_PROFILE_SPECIFIER = "BlueLyrics tvOS App Store 20260912";
 				SDKROOT = appletvos;
 				SWIFT_STRICT_CONCURRENCY = minimal;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -211,7 +228,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.blueguard.bluelyrics.tv;
+				PRODUCT_BUNDLE_IDENTIFIER = com.blueguard.bluelyrics;
 				PRODUCT_NAME = BlueLyrics;
 				SDKROOT = appletvos;
 				SWIFT_STRICT_CONCURRENCY = minimal;
