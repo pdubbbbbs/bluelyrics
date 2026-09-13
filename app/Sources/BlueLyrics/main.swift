@@ -333,6 +333,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     menu.addItem(withTitle: "Close all windows", action: #selector(closeAll), keyEquivalent: "w").target = self
     menu.addItem(.separator())
     menu.addItem(withTitle: "Open in browser (for casting)", action: #selector(openBrowser), keyEquivalent: "b").target = self
+    let tv = NSMenuItem(title: "Apple TV: open BlueLyrics on the TV, it finds “\(Host.current().localizedName ?? "this Mac")”", action: nil, keyEquivalent: "")
+    tv.isEnabled = false
+    menu.addItem(tv)
     menu.addItem(withTitle: "Reload", action: #selector(reload), keyEquivalent: "r").target = self
     menu.addItem(.separator())
     menu.addItem(withTitle: "Quit BlueLyrics", action: #selector(quit), keyEquivalent: "q").target = self

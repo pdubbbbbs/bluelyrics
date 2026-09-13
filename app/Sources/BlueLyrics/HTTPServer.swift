@@ -71,6 +71,8 @@ final class HTTPServer {
     let params = NWParameters.tcp
     params.allowLocalEndpointReuse = true
     let listener = try NWListener(using: params, on: NWEndpoint.Port(rawValue: port)!)
+    // Advertise on the LAN so the Apple TV app can find this Mac without typing an address.
+    listener.service = NWListener.Service(name: Host.current().localizedName ?? "BlueLyrics", type: "_bluelyrics._tcp")
     listener.newConnectionHandler = { [weak self] connection in self?.accept(connection) }
     listener.stateUpdateHandler = { [weak self] state in
       guard let self else { return }
