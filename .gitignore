@@ -28,3 +28,5 @@ extension.copy-*/
 tv/build/
 tv/*.xcodeproj/xcuserdata/
 tv/*.xcodeproj/project.xcworkspace/xcuserdata/
+ios/build/
+ios/*.xcodeproj/xcuserdata/

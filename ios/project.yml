@@ -1,0 +1,49 @@
+name: BlueLyricsiOS
+options:
+  bundleIdPrefix: com.blueguard
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    DEVELOPMENT_TEAM: 2PV5B37GLP
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: 1
+    CODE_SIGN_STYLE: Automatic
+    IPHONEOS_DEPLOYMENT_TARGET: "17.0"
+targets:
+  BlueLyricsiOS:
+    type: application
+    platform: iOS
+    sources:
+      # Portable pieces shared with the Apple TV client.
+      - path: ../tv/Sources/BlueLyricsTV/Models.swift
+      - path: ../tv/Sources/BlueLyricsTV/SSEClient.swift
+      - path: ../tv/Sources/BlueLyricsTV/Store.swift
+      - path: ../tv/Sources/BlueLyricsTV/Theme.swift
+      - path: ../tv/Sources/BlueLyricsTV/Fonts.swift
+      - path: ../tv/Sources/BlueLyricsTV/LyricsFetcher.swift
+      - path: ../tv/Sources/BlueLyricsTV/MusicPlayerStore.swift
+      - path: Sources/BlueLyricsiOS
+      - path: Assets.xcassets
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.blueguard.bluelyrics
+        PRODUCT_NAME: BlueLyrics
+        INFOPLIST_FILE: Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        SWIFT_STRICT_CONCURRENCY: minimal
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SUPPORTS_MACCATALYST: NO
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Apple Distribution"
+          PROVISIONING_PROFILE_SPECIFIER: "BlueLyrics iOS App Store 20260916"
+    dependencies:
+      - sdk: Network.framework
+      - sdk: MusicKit.framework

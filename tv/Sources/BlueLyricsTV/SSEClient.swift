@@ -11,6 +11,8 @@ final class SSEClient {
   private let handler: Handler
   private let onState: (Bool) -> Void
   private var task: Task<Void, Never>?
+  /// How this client introduces itself to the Mac ("appletv", "iphone", "ipad").
+  static var clientTag = "appletv"
 
   init(url: URL, onState: @escaping (Bool) -> Void, handler: @escaping Handler) {
     self.url = url
@@ -27,7 +29,7 @@ final class SSEClient {
           var request = URLRequest(url: url)
           request.timeoutInterval = 60 * 60 * 24
           request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
-          request.setValue("appletv", forHTTPHeaderField: "X-BlueLyrics-Client")
+          request.setValue(SSEClient.clientTag, forHTTPHeaderField: "X-BlueLyrics-Client")
           request.setValue(await MainActor.run { UIDevice.current.name }, forHTTPHeaderField: "X-BlueLyrics-Name")
           let (bytes, response) = try await URLSession.shared.bytes(for: request)
           guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }

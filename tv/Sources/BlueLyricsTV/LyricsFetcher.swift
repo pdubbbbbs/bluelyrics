@@ -6,6 +6,7 @@ import Foundation
 struct FetchedLyrics { var source: String; var synced: Bool; var lines: [LyricLine] }
 
 actor LyricsFetcher {
+  static var userAgent = "BlueLyrics-tvOS/1.0 (github.com/pdubbbbbs/bluelyrics)"
   private var cache: [String: FetchedLyrics] = [:]
   private static let lrcTime = try! NSRegularExpression(pattern: "\\[(\\d+):(\\d+(?:\\.\\d+)?)\\]")
   private static let titleNoise = try! NSRegularExpression(
@@ -21,7 +22,7 @@ actor LyricsFetcher {
 
   private func get(_ url: URL) async -> Any? {
     var request = URLRequest(url: url, timeoutInterval: 10)
-    request.setValue("BlueLyrics-tvOS/1.0 (github.com/pdubbbbbs/bluelyrics)", forHTTPHeaderField: "User-Agent")
+    request.setValue(LyricsFetcher.userAgent, forHTTPHeaderField: "User-Agent")
     guard let (data, response) = try? await URLSession.shared.data(for: request),
           (response as? HTTPURLResponse)?.statusCode == 200 else { return nil }
     return try? JSONSerialization.jsonObject(with: data)
