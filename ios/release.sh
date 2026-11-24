@@ -4,7 +4,7 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"; cd "$HERE"
 BUILD="${1:?usage: ./release.sh <build-number>}"
-export DEVELOPER_DIR="${DEVELOPER_DIR:-/Volumes/cloud/dubsf3/Applications/Xcode.app/Contents/Developer}"
+export DEVELOPER_DIR="${DEVELOPER_DIR:-$(xcode-select -p)}"
 XCODEBUILD="$DEVELOPER_DIR/usr/bin/xcodebuild"
 APP_ID="6809355924"          # App Store Connect app record shared with the Mac and tvOS apps
 API_KEY="93ZTYF69FA"         # AuthKey_93ZTYF69FA.p8 in ~/.private_keys

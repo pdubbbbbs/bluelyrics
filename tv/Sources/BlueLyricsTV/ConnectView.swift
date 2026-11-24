@@ -62,10 +62,10 @@ struct ConnectView: View {
 
         VStack(alignment: .leading, spacing: 16) {
           Text(discovery.found.isEmpty ? "Address of the Mac running BlueLyrics" : "Or type the address").font(.headline).foregroundStyle(.white.opacity(0.6))
-          Text("It is printed by the ♪ menu on the Mac under Open in browser, for example 10.10.10.169:7331.")
+          Text("It is printed by the ♪ menu on the Mac under Open in browser, for example 192.168.1.50:7331.")
             .font(.callout).foregroundStyle(.white.opacity(0.5))
           HStack(spacing: 24) {
-            TextField("10.10.10.169:7331", text: $address)
+            TextField("192.168.1.50:7331", text: $address)
               .keyboardType(.numbersAndPunctuation)
               .textInputAutocapitalization(.never)
               .autocorrectionDisabled()

@@ -23,13 +23,13 @@ and comet glow as the Mac page. Verified end to end in the simulator against a d
   Bonjour discovery), `SSEClient.swift`, `LyricsView.swift`, `ConnectView.swift`, `Models.swift`.
 - Discovery uses `_bluelyrics._tcp`; the Mac server advertises it from the `HTTPServer.start()`
   change in `app/Sources/BlueLyrics/HTTPServer.swift`. Until a Mac build carrying that change is
-  running, type the address shown by the Mac's ♪ menu (for example `10.10.10.169:7331`).
+  running, type the address shown by the Mac's ♪ menu (for example `192.168.1.50:7331`).
 - Menu button on the remote returns to the connect screen.
 
 Build for the simulator without signing:
 
 ```
-DEVELOPER_DIR=/Volumes/cloud/dubsf3/Applications/Xcode.app/Contents/Developer \
+DEVELOPER_DIR="$(xcode-select -p)" \
   $DEVELOPER_DIR/usr/bin/xcodebuild -project BlueLyricsTV.xcodeproj -scheme BlueLyricsTV \
   -sdk appletvsimulator -destination 'generic/platform=tvOS Simulator' \
   -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build

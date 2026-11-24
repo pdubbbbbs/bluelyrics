@@ -31,10 +31,10 @@ screen (Esc undoes it), next display, all displays, on top, glass, cast
 The lyrics page is served on the local network. Guests on the house Wi-Fi
 open this address in any browser, on a phone, tablet, laptop or TV browser:
 
-    http://10.10.10.169:7331/
+    http://192.168.1.50:7331/
 
 (That is the Mac's wired address. On Wi-Fi the Mac also answers at
-http://10.10.31.123:7331/. `./bluelyrics.sh url` prints whatever is current,
+http://192.168.1.51:7331/. `./bluelyrics.sh url` prints whatever is current,
 and the Cast button in the window shows it in large type for the room.)
 
 Double-click the page for full screen. Text size, sync offset and line count

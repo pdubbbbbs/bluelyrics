@@ -64,10 +64,10 @@ struct ConnectView: View {
                 Text("Looking for Macs on your network…").font(.footnote).foregroundStyle(.white.opacity(0.5))
               }
             }
-            Text(discovery.found.isEmpty ? "Or type the Mac's address. It is shown by the ♪ menu on the Mac under Open in browser, for example 10.10.10.169:7331." : "Or type the address.")
+            Text(discovery.found.isEmpty ? "Or type the Mac's address. It is shown by the ♪ menu on the Mac under Open in browser, for example 192.168.1.50:7331." : "Or type the address.")
               .font(.footnote).foregroundStyle(.white.opacity(0.5))
             HStack(spacing: 10) {
-              TextField("10.10.10.169:7331", text: $address)
+              TextField("192.168.1.50:7331", text: $address)
                 .keyboardType(.numbersAndPunctuation)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
